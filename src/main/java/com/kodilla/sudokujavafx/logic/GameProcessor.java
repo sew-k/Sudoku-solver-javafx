@@ -15,7 +15,7 @@ public enum GameProcessor {
         drawer.drawMainWindow(stage, board);
     }
     public void processGame(Stage stage) {
-        SudokuBoard board = new SudokuBoard();
+        board = new SudokuBoard();
         drawer.drawMainWindow(stage, board);
     }
 
@@ -23,5 +23,11 @@ public enum GameProcessor {
         stage.close();
     }
 
+    public SudokuBoard getBoard() {
+        return board;
+    }
 
+    public void setBoard(SudokuBoard board) {
+        this.board = board;
+    }
 }

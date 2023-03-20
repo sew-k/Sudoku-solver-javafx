@@ -15,8 +15,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.controlsfx.control.action.Action;
+
+import java.io.File;
+import java.io.IOException;
 
 public enum Drawer {
     INSTANCE;
@@ -27,7 +31,6 @@ public enum Drawer {
         GridPane gridPane = new GridPane();
         for (int r = 0; r < board.getSudokuBoardList().size(); r++) {
             for (int c = 0; c < board.getSudokuBoardList().get(r).getSudokuElementsList().size(); c++) {
-
 
                 TextField field = drawField(board.getSudokuBoardList().get(r).getSudokuElementsList().get(c));
                 gridPane.add(field, c, r);
@@ -74,6 +77,7 @@ public enum Drawer {
                             sudokuElement.getRowIndex() + "/ column index " +
                             sudokuElement.getColIndex() + "; changed from " +
                             oldValue + " to " + newValue + " : " + sudokuElement.getFieldValue());
+                    System.out.println(GameProcessor.INSTANCE.getBoard());
                 } else {
                     field.setText("");
                     field.setText(oldValue);
@@ -83,24 +87,7 @@ public enum Drawer {
                 field.clear();
             }
         }
-
-
-
-                ));
-//        field.setOnAction(new EventHandler<ActionEvent>() {
-//            @Override
-//            public void handle(ActionEvent event) {
-//                String text = field.getText();
-//                if (Validator.INSTANCE.checkFieldTextToInt(text)) {
-//                    sudokuElement.setFieldValue(Integer.parseInt(text));
-//                } else {
-//                    field.clear();
-//                }
-//
-//            }
-//        });
-
-
+        ));
         return field;
     }
 
@@ -120,13 +107,55 @@ public enum Drawer {
         });
         game.getItems().addAll(newGame, loadGame, saveGame, exitGame);
 
+        Menu boardMenu = new Menu("Board");
+        MenuItem newRandomBoard = new MenuItem("New random board");
+        MenuItem setBoardManually = new MenuItem("Set board manually");
+        MenuItem loadBoard = new MenuItem("Load board");
+        loadBoard.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Load board");
+                File file = fileChooser.showOpenDialog(stage);
+                if (file != null) {
+                    board.loadBoard(file);
+                }
+            }
+        });
+        MenuItem saveBoard = new MenuItem("Save board");
+        saveBoard.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Save board");
+                File file = fileChooser.showSaveDialog(stage);
+                if (file != null) {
+                    try {
+                        board.saveBoard(file, GameProcessor.INSTANCE.getBoard());
+                    } catch (IOException e) {
+                        System.out.println("Exception while saving board: " + e);
+                    }
+                }
+            }
+        });
+        MenuItem clearBoard = new MenuItem("Clear board");
+        clearBoard.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                GameProcessor.INSTANCE.setBoard(board.clearBoard());
+                System.out.println(GameProcessor.INSTANCE.getBoard());
+                drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
+            }
+        });
+        boardMenu.getItems().addAll(newRandomBoard, setBoardManually, loadBoard, saveBoard, clearBoard);
+
         Menu settings = new Menu("Settings");
         MenuItem difSettings = new MenuItem("Difficulty settings");
         MenuItem playerSettings = new MenuItem("Player settings");
         MenuItem boardSettings = new MenuItem("Board settings");
         settings.getItems().addAll(difSettings, playerSettings, boardSettings);
 
-        menuBar.getMenus().addAll(game, settings);
+        menuBar.getMenus().addAll(game, boardMenu, settings);
         VBox root = new VBox();
         root.getChildren().add(menuBar);
         root.getChildren().add(drawBoardInPane(board));

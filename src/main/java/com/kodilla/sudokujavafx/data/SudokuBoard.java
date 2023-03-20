@@ -1,7 +1,18 @@
 package com.kodilla.sudokujavafx.data;
 
+import com.kodilla.sudokujavafx.logic.GameProcessor;
+import com.kodilla.sudokujavafx.logic.Validator;
+import javafx.scene.control.MenuItem;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SudokuBoard {
     private List<SudokuRow> sudokuBoardList;
@@ -60,5 +71,64 @@ public class SudokuBoard {
         this.sudokuBoardList = sudokuBoardList;
     }
 
+    public void newRandomBoard() {
+
+    }
+
+    public void setBoardManually() {
+
+    }
+    public SudokuBoard setBoardFromString(String text) throws IOException {
+        SudokuBoard newBoard = new SudokuBoard();
+        int i = 0;
+//        String pureText = Stream.of(text).filter(c -> Validator.INSTANCE.checkFieldTextToInt(c)).collect(Collectors.joining());
+//        System.out.println(pureText);
+        for (int row = 0; row < 9; row++) {
+            for (int col = 0; col < 9; col++) {
+                if (Validator.INSTANCE.checkFieldTextToInt(Character.toString(text.charAt(i)))) {
+                    int elementValue = Integer.parseInt(Character.toString(text.charAt(i)));
+                    newBoard.setValueElementFromBoard(elementValue, row, col);
+                    i++;
+                } else {
+                    throw new IOException("*** invalid element value at [" + i + "] ***");
+                }
+            }
+        }
+        return newBoard;
+    }
+
+    public void loadBoard(File file) {
+        System.out.println(file);
+        try {
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            String textFromFile = Files.readString(file.toPath());
+            String newString = "";
+            for (char c : textFromFile.toCharArray()) {
+                if (Validator.INSTANCE.getAvailableCharacterForSudoku().contains(c)) {
+                    newString = newString + c;
+                }
+            }
+            System.out.println(newString);
+
+//            System.out.println(textFromFile.charAt(9));
+            SudokuBoard newBoard = setBoardFromString(newString);
+            System.out.println("board");
+            System.out.println(newBoard);
+            GameProcessor.INSTANCE.setBoard(newBoard);
+            System.out.println("Successful loaded board: " + GameProcessor.INSTANCE.getBoard());
+
+        } catch (IOException e) {
+            System.out.println("Exception:" + e);
+        }
+    }
+    public void saveBoard(File file, SudokuBoard board) throws IOException {
+        byte[] bytes = board.toString().getBytes();
+        Files.write(file.toPath(), bytes);
+    }
+    public SudokuBoard clearBoard() {
+        SudokuBoard board = new SudokuBoard();
+        System.out.println(board);
+        return board;
+    }
 
 }
