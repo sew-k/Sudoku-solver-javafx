@@ -119,6 +119,7 @@ public enum Drawer {
                 File file = fileChooser.showOpenDialog(stage);
                 if (file != null) {
                     board.loadBoard(file);
+                    drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
                 }
             }
         });

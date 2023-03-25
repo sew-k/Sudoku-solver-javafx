@@ -81,13 +81,13 @@ public class SudokuBoard {
     public SudokuBoard setBoardFromString(String text) throws IOException {
         SudokuBoard newBoard = new SudokuBoard();
         int i = 0;
-//        String pureText = Stream.of(text).filter(c -> Validator.INSTANCE.checkFieldTextToInt(c)).collect(Collectors.joining());
-//        System.out.println(pureText);
         for (int row = 0; row < 9; row++) {
             for (int col = 0; col < 9; col++) {
                 if (Validator.INSTANCE.checkFieldTextToInt(Character.toString(text.charAt(i)))) {
                     int elementValue = Integer.parseInt(Character.toString(text.charAt(i)));
                     newBoard.setValueElementFromBoard(elementValue, row, col);
+                    System.out.println("elementValue: " + elementValue);
+                    System.out.println("i: " + i);
                     i++;
                 } else {
                     throw new IOException("*** invalid element value at [" + i + "] ***");
@@ -100,7 +100,7 @@ public class SudokuBoard {
     public void loadBoard(File file) {
         System.out.println(file);
         try {
-            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            System.out.println("Loading the board");
             String textFromFile = Files.readString(file.toPath());
             String newString = "";
             for (char c : textFromFile.toCharArray()) {
@@ -109,13 +109,11 @@ public class SudokuBoard {
                 }
             }
             System.out.println(newString);
-
-//            System.out.println(textFromFile.charAt(9));
             SudokuBoard newBoard = setBoardFromString(newString);
             System.out.println("board");
             System.out.println(newBoard);
             GameProcessor.INSTANCE.setBoard(newBoard);
-            System.out.println("Successful loaded board: " + GameProcessor.INSTANCE.getBoard());
+            System.out.println("Successful loaded board: \n" + GameProcessor.INSTANCE.getBoard());
 
         } catch (IOException e) {
             System.out.println("Exception:" + e);

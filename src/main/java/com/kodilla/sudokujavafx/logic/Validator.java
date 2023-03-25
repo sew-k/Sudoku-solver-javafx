@@ -12,7 +12,7 @@ public enum Validator {
     }
 
     public boolean checkFieldTextToInt(String text) throws NumberFormatException {
-        if (Integer.parseInt(text) > 0 && Integer.parseInt(text) <= 9) {
+        if (Integer.parseInt(text) >= 0 && Integer.parseInt(text) <= 9) {
             return true;
         } else {
             return false;
