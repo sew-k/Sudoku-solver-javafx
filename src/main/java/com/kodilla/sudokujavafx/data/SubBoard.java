@@ -1,5 +1,6 @@
 package com.kodilla.sudokujavafx.data;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public enum SubBoard {
     BOTTOM_CENTER,
     BOTTOM_RIGHT;
 
-    private List<SudokuElement> subBoardElementsList;
+    private List<SudokuElement> subBoardElementsList = new ArrayList<>();
     private int subBoardRowIndex;
     private int subBoardColIndex;
 
@@ -30,18 +31,20 @@ public enum SubBoard {
         this.subBoardElementsList = subBoardElementsList;
     }
 
+
     public void addElementsToSubBoardElementsList(SubBoard subBoard, SudokuBoard board) {
+        subBoard.getSubBoardElementsList().clear();
         switch (subBoard) {
             case TOP_LEFT -> {
-                subBoardElementsList.add(board.getElementFromBoard(0,0));
-                subBoardElementsList.add(board.getElementFromBoard(0,1));
-                subBoardElementsList.add(board.getElementFromBoard(0,2));
-                subBoardElementsList.add(board.getElementFromBoard(1,0));
-                subBoardElementsList.add(board.getElementFromBoard(1,1));
-                subBoardElementsList.add(board.getElementFromBoard(1,2));
-                subBoardElementsList.add(board.getElementFromBoard(2,0));
-                subBoardElementsList.add(board.getElementFromBoard(2,1));
-                subBoardElementsList.add(board.getElementFromBoard(2,2));
+                board.getSubBoardList().get(0).getSubBoardElementsList().add(board.getElementFromBoard(0,0));
+                board.getSubBoardList().get(0).getSubBoardElementsList().add(board.getElementFromBoard(0,1));
+                board.getSubBoardList().get(0).getSubBoardElementsList().add(board.getElementFromBoard(0,2));
+                board.getSubBoardList().get(0).getSubBoardElementsList().add(board.getElementFromBoard(1,0));
+                board.getSubBoardList().get(0).getSubBoardElementsList().add(board.getElementFromBoard(1,1));
+                board.getSubBoardList().get(0).getSubBoardElementsList().add(board.getElementFromBoard(1,2));
+                board.getSubBoardList().get(0).getSubBoardElementsList().add(board.getElementFromBoard(2,0));
+                board.getSubBoardList().get(0).getSubBoardElementsList().add(board.getElementFromBoard(2,1));
+                board.getSubBoardList().get(0).getSubBoardElementsList().add(board.getElementFromBoard(2,2));
                 setSubBoardRowIndex(0);
                 setSubBoardColIndex(0);
             }

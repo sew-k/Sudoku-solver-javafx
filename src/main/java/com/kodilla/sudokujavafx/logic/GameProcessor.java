@@ -8,6 +8,7 @@ public enum GameProcessor {
     INSTANCE;
     private Drawer drawer = Drawer.INSTANCE;
     private SudokuBoard board;
+    private static GameDifficulty difficulty = GameDifficulty.EASY;
     private GameProcessor() {
     }
     public void processGame(Stage stage, SudokuBoard board) {
@@ -29,5 +30,13 @@ public enum GameProcessor {
 
     public void setBoard(SudokuBoard board) {
         this.board = board;
+    }
+
+    public static GameDifficulty getDifficulty() {
+        return difficulty;
+    }
+
+    public static void setDifficulty(GameDifficulty difficulty) {
+        GameProcessor.difficulty = difficulty;
     }
 }

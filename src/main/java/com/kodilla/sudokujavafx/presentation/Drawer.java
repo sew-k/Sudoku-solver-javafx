@@ -3,6 +3,7 @@ package com.kodilla.sudokujavafx.presentation;
 import com.kodilla.sudokujavafx.data.SudokuBoard;
 import com.kodilla.sudokujavafx.data.SudokuElement;
 import com.kodilla.sudokujavafx.data.SudokuRow;
+import com.kodilla.sudokujavafx.logic.GameDifficulty;
 import com.kodilla.sudokujavafx.logic.GameProcessor;
 import com.kodilla.sudokujavafx.logic.Validator;
 import javafx.event.ActionEvent;
@@ -27,12 +28,12 @@ public enum Drawer {
     private Drawer() {
 
     }
-    public Pane drawBoardInPane(SudokuBoard board) {
+    public Pane drawBoardInPane(Stage stage, SudokuBoard board) {
         GridPane gridPane = new GridPane();
         for (int r = 0; r < board.getSudokuBoardList().size(); r++) {
             for (int c = 0; c < board.getSudokuBoardList().get(r).getSudokuElementsList().size(); c++) {
 
-                TextField field = drawField(board.getSudokuBoardList().get(r).getSudokuElementsList().get(c));
+                TextField field = drawField(stage, board.getSudokuBoardList().get(r).getSudokuElementsList().get(c));
                 gridPane.add(field, c, r);
 
             }
@@ -55,7 +56,7 @@ public enum Drawer {
 //        return label;
 //    }
 
-    public TextField drawField(SudokuElement sudokuElement) {
+    public TextField drawField(Stage stage, SudokuElement sudokuElement) {
         String fieldValue = Integer.toString(sudokuElement.getFieldValue());
         if (fieldValue.equals("0")) fieldValue = "";
         TextField field = new TextField(fieldValue);
@@ -64,20 +65,42 @@ public enum Drawer {
         field.setAlignment(Pos.CENTER);
 
         if (sudokuElement.isFixed()) {
-            field.setStyle("-fx-text-fill: BLACK; -fx-border-color: gray; -fx-font-size: 18");
+            field.setStyle("-fx-text-fill: BLACK; -fx-border-color: gray; -fx-font-size: 18; -fx-font-weight: bold");
             field.setEditable(false);
         } else {
             field.setStyle("-fx-text-fill: BLUE; -fx-border-color: gray; -fx-font-size: 18");
+            field.setEditable(true);
         }
         field.textProperty().addListener(((observable, oldValue, newValue) -> {
             try {
-                if (Validator.INSTANCE.checkFieldTextToInt(newValue)) {
+                if ((Validator.INSTANCE.checkFieldTextToInt(newValue)) && !newValue.equals("0")) {
+
+                    if (GameProcessor.getDifficulty().equals(GameDifficulty.EASY)) {
+                        if (!(sudokuElement.getAvailableFieldValues(GameProcessor.INSTANCE.getBoard())
+                                .contains(Integer.parseInt(newValue)))) {
+                            field.setStyle("-fx-text-fill: RED; -fx-border-color: gray; -fx-font-size: 18");
+                        } else {
+                            field.setStyle("-fx-text-fill: BLUE; -fx-border-color: gray; -fx-font-size: 18");
+                        }
+                    }
                     sudokuElement.setFieldValue(Integer.parseInt(newValue));
                     System.out.println("textfield at row index " +
                             sudokuElement.getRowIndex() + "/ column index " +
                             sudokuElement.getColIndex() + "; changed from " +
                             oldValue + " to " + newValue + " : " + sudokuElement.getFieldValue());
                     System.out.println(GameProcessor.INSTANCE.getBoard());
+
+                    GameProcessor.INSTANCE.getBoard().calculateBoard();
+
+                    System.out.println("SubBoard values list: " +
+                            GameProcessor.INSTANCE.getBoard()
+                                    .getSubBoardValues(sudokuElement.getRowIndex(), sudokuElement.getColIndex()));
+
+                    System.out.println(GameProcessor.INSTANCE.getBoard()
+                            .getElementFromBoard(sudokuElement.getRowIndex(), sudokuElement.getColIndex())
+                            .getAvailableFieldValues(GameProcessor.INSTANCE.getBoard()));
+
+
                 } else {
                     field.setText("");
                     field.setText(oldValue);
@@ -88,6 +111,17 @@ public enum Drawer {
             }
         }
         ));
+
+//        GameProcessor.INSTANCE.getBoard().updateSubBoards();
+//
+//        System.out.println(GameProcessor.INSTANCE.getBoard().getSubBoardValues(sudokuElement.getRowIndex(), sudokuElement.getColIndex()));
+//        if (GameProcessor.INSTANCE.getBoard().getElementFromBoard(sudokuElement.getRowIndex(), sudokuElement.getColIndex())
+//                .getAvailableFieldValues(GameProcessor.INSTANCE.getBoard()).contains(field.getText())) {
+//            field.setStyle("-fx-text-fill: BLUE; -fx-border-color: gray; -fx-font-size: 18");
+//        } else {
+//            field.setStyle("-fx-text-fill: RED; -fx-border-color: gray; -fx-font-size: 18");
+//        }
+
         return field;
     }
 
@@ -159,7 +193,7 @@ public enum Drawer {
         menuBar.getMenus().addAll(game, boardMenu, settings);
         VBox root = new VBox();
         root.getChildren().add(menuBar);
-        root.getChildren().add(drawBoardInPane(board));
+        root.getChildren().add(drawBoardInPane(stage, board));
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.show();

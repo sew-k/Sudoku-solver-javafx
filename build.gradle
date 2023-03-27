@@ -40,8 +40,10 @@ dependencies {
         exclude(group: 'org.openjfx')
     }
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.0.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+
 }
 
 test {
