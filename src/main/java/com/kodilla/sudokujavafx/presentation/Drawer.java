@@ -14,6 +14,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -22,6 +23,8 @@ import org.controlsfx.control.action.Action;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 
 public enum Drawer {
     INSTANCE;
@@ -40,21 +43,6 @@ public enum Drawer {
         }
         return gridPane;
     }
-
-//    public Label drawField(SudokuElement sudokuElement) {
-//        String fieldValue = Integer.toString(sudokuElement.getFieldValue());
-//        if (fieldValue.equals("0")) fieldValue = " ";
-//        Label label = new Label(fieldValue);
-//        label.setMinSize(30,30);
-//        label.setAlignment(Pos.CENTER);
-//
-//        if (sudokuElement.isFixed()) {
-//            label.setStyle("-fx-text-fill: BLACK; -fx-border-color: gray; -fx-font-size: 18");
-//        } else {
-//            label.setStyle("-fx-text-fill: BLUE; -fx-border-color: gray; -fx-font-size: 18");
-//        }
-//        return label;
-//    }
 
     public TextField drawField(Stage stage, SudokuElement sudokuElement) {
         String fieldValue = Integer.toString(sudokuElement.getFieldValue());
@@ -92,36 +80,25 @@ public enum Drawer {
 
                     GameProcessor.INSTANCE.getBoard().calculateBoard();
 
-                    System.out.println("SubBoard values list: " +
-                            GameProcessor.INSTANCE.getBoard()
-                                    .getSubBoardValues(sudokuElement.getRowIndex(), sudokuElement.getColIndex()));
+                    List<Integer> subBoardValuesList = GameProcessor.INSTANCE.getBoard()
+                            .getSubBoardValues(sudokuElement.getRowIndex(), sudokuElement.getColIndex());
+                    System.out.println("SubBoard values list: " + subBoardValuesList);
 
                     System.out.println(GameProcessor.INSTANCE.getBoard()
                             .getElementFromBoard(sudokuElement.getRowIndex(), sudokuElement.getColIndex())
                             .getAvailableFieldValues(GameProcessor.INSTANCE.getBoard()));
 
-
                 } else {
                     field.setText("");
-                    field.setText(oldValue);
+                    //field.setText(oldValue);
                 }
             } catch (NumberFormatException e) {
                 System.out.println("exception: " + e);
                 field.clear();
+                sudokuElement.setFieldValue(0);
             }
         }
         ));
-
-//        GameProcessor.INSTANCE.getBoard().updateSubBoards();
-//
-//        System.out.println(GameProcessor.INSTANCE.getBoard().getSubBoardValues(sudokuElement.getRowIndex(), sudokuElement.getColIndex()));
-//        if (GameProcessor.INSTANCE.getBoard().getElementFromBoard(sudokuElement.getRowIndex(), sudokuElement.getColIndex())
-//                .getAvailableFieldValues(GameProcessor.INSTANCE.getBoard()).contains(field.getText())) {
-//            field.setStyle("-fx-text-fill: BLUE; -fx-border-color: gray; -fx-font-size: 18");
-//        } else {
-//            field.setStyle("-fx-text-fill: RED; -fx-border-color: gray; -fx-font-size: 18");
-//        }
-
         return field;
     }
 
@@ -153,6 +130,7 @@ public enum Drawer {
                 File file = fileChooser.showOpenDialog(stage);
                 if (file != null) {
                     board.loadBoard(file);
+                    GameProcessor.INSTANCE.getBoard().setName(file.getName());
                     drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
                 }
             }
@@ -191,11 +169,57 @@ public enum Drawer {
         settings.getItems().addAll(difSettings, playerSettings, boardSettings);
 
         menuBar.getMenus().addAll(game, boardMenu, settings);
+
+        String fileName = GameProcessor.INSTANCE.getBoard().getName();
+        int numberOfPossibleCombinations = board.getPossibleSolveCombination();
+        Label topLabel = new Label("Board name: '" + fileName + "'.  Possible combinations: " + numberOfPossibleCombinations);
+
         VBox root = new VBox();
+        Button undoButton = new Button("<");
+        undoButton.setMinSize(50,50);
+        undoButton.setMaxSize(50,50);
+        undoButton.setTooltip(new Tooltip("Undo last move"));
+        Button solveOneFieldButton = new Button(">");
+        solveOneFieldButton.setMinSize(50,50);
+        solveOneFieldButton.setMaxSize(50,50);
+        solveOneFieldButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                GameProcessor.INSTANCE.solveRandomSudokuElement(board);
+                System.out.println(GameProcessor.INSTANCE.getBoard());
+                drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
+            }
+        });
+        solveOneFieldButton.setTooltip(new Tooltip("Solve one random\n field from this\n board"));
+        Button solveButton = new Button(">>");
+        solveButton.setMinSize(50,50);
+        solveButton.setMaxSize(50,50);
+        solveButton.setTooltip(new Tooltip("Solve this board"));
+        Button clearButton = new Button("X");
+        clearButton.setMinSize(50,50);
+        clearButton.setMaxSize(50,50);
+        clearButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                GameProcessor.INSTANCE.setBoard(board.clearBoard());
+                System.out.println(GameProcessor.INSTANCE.getBoard());
+                drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
+            }
+        });
+        clearButton.setTooltip(new Tooltip("Clear this board"));
+        Button randomBoardButton = new Button("?");
+        randomBoardButton.setMinSize(50,50);
+        randomBoardButton.setMaxSize(50,50);
+        randomBoardButton.setTooltip(new Tooltip("Clear and set\n new random board"));
+        HBox buttonsHBox = new HBox(undoButton, solveOneFieldButton, solveButton, clearButton, randomBoardButton);
+        buttonsHBox.setAlignment(Pos.CENTER);
         root.getChildren().add(menuBar);
+        root.getChildren().add(topLabel);
         root.getChildren().add(drawBoardInPane(stage, board));
+        root.getChildren().add(buttonsHBox);
         Scene scene = new Scene(root);
         stage.setScene(scene);
+        stage.setResizable(false);
         stage.show();
     }
 

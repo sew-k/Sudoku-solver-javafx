@@ -16,28 +16,40 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class SudokuBoard {
+    private String name;
+    private int numberOfCopy;
     private List<SudokuRow> sudokuBoardList;
     private List<SubBoard> subBoardList = new ArrayList<>(Arrays.asList(
             SubBoard.TOP_LEFT, SubBoard.TOP_CENTER, SubBoard.TOP_RIGHT,
             SubBoard.CENTER_LEFT, SubBoard.CENTER, SubBoard.CENTER_RIGHT,
             SubBoard.BOTTOM_LEFT, SubBoard.BOTTOM_CENTER, SubBoard.BOTTOM_RIGHT));
-//    static {
-//        subBoardList.add(SubBoard.TOP_LEFT);
-//        subBoardList.add(SubBoard.TOP_CENTER);
-//        subBoardList.add(SubBoard.TOP_RIGHT);
-//        subBoardList.add(SubBoard.CENTER_LEFT);
-//        subBoardList.add(SubBoard.CENTER);
-//        subBoardList.add(SubBoard.CENTER_RIGHT);
-//        subBoardList.add(SubBoard.BOTTOM_LEFT);
-//        subBoardList.add(SubBoard.BOTTOM_CENTER);
-//        subBoardList.add(SubBoard.BOTTOM_RIGHT);
-//    }
 
     public SudokuBoard() {
         sudokuBoardList = new ArrayList<>();
         for (int i = 0; i < 9; i++) {
             sudokuBoardList.add(new SudokuRow(i));
         }
+        setNumberOfCopy(0);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getNumberOfCopy() {
+        return numberOfCopy;
+    }
+
+    public void setNumberOfCopy(int numberOfCopy) {
+        this.numberOfCopy = numberOfCopy;
+    }
+
+    public void setSubBoardList(List<SubBoard> subBoardList) {
+        this.subBoardList = subBoardList;
     }
 
     public void updateSubBoards() {
@@ -243,5 +255,27 @@ public class SudokuBoard {
 
     public List<SubBoard> getSubBoardList() {
         return subBoardList;
+    }
+
+    public List<SudokuElement> getUnsolvedSudokuElements() {
+        return getSudokuBoardList().stream()
+                .flatMap(l -> l.getSudokuElementsList().stream())
+                .filter(e -> e.getFieldValue() == 0)
+                .collect(Collectors.toList());
+    }
+
+    public int getPossibleSolveCombination() {
+        calculateBoard();
+        List<Integer> numberAvailableFieldValuesForElements = getSudokuBoardList().stream()
+                .flatMap(b -> b.getSudokuElementsList().stream())
+                .filter(x -> !x.isFixed())
+                .filter(y ->  y.getFieldValue() == 0)
+                .map(e -> e.getAvailableFieldValues())
+                .map(s -> s.size())
+                .collect(Collectors.toList());
+
+        return numberAvailableFieldValuesForElements.stream()
+                .mapToInt(v -> v)
+                .min().orElse(-1);         //TODO if -1 means sudoku solved, if 0 - sudoku unable to solve
     }
 }
