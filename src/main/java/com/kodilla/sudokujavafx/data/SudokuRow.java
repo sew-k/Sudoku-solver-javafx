@@ -8,6 +8,24 @@ public class SudokuRow {
     private List<SudokuElement> sudokuElementsList;
     private int rowNumber;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SudokuRow sudokuRow = (SudokuRow) o;
+
+        if (rowNumber != sudokuRow.rowNumber) return false;
+        return sudokuElementsList.equals(sudokuRow.sudokuElementsList);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = sudokuElementsList.hashCode();
+        result = 31 * result + rowNumber;
+        return result;
+    }
+
     public SudokuRow(int rowNumber) {
         sudokuElementsList = new ArrayList<>();
         for (int i = 0; i < 9; i++) {

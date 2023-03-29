@@ -11,6 +11,28 @@ public class SudokuElement {
     private int colIndex;
     private boolean fixed;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SudokuElement that = (SudokuElement) o;
+
+        if (fieldValue != that.fieldValue) return false;
+        if (rowIndex != that.rowIndex) return false;
+        if (colIndex != that.colIndex) return false;
+        return fixed == that.fixed;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = fieldValue;
+        result = 31 * result + rowIndex;
+        result = 31 * result + colIndex;
+        result = 31 * result + (fixed ? 1 : 0);
+        return result;
+    }
+
     public boolean isFixed() {
         return fixed;
     }
@@ -24,6 +46,13 @@ public class SudokuElement {
         availableFieldValues = new HashSet<>(Set.of(0,1,2,3,4,5,6,7,8,9));
         this.rowIndex = rowIndex;
         this.colIndex = colIndex;
+    }
+    public SudokuElement(int fieldValue, int rowIndex, int colIndex, Set<Integer> availableFieldValues, boolean fixed) {
+        this.fieldValue = fieldValue;
+        this.rowIndex = rowIndex;
+        this.colIndex = colIndex;
+        this.availableFieldValues = availableFieldValues;
+        this.fixed = fixed;
     }
 
     @Override

@@ -70,6 +70,35 @@ class SudokuBoardTests {
         //Then
         Assertions.assertEquals(expectedList, resultList);
     }
+    @Test
+    void testDeepCopy() {
+        //Given
+        SudokuBoard board = new SudokuBoard();
+        board.setNumberOfCopy(2);
+        board.setName("test");
+        board.setValueElementFromBoard(4,0,1);
+        board.setValueElementFromBoard(5,0,2);
+        board.setValueElementFromBoard(6,0,3);
+        board.setValueElementFromBoard(7,1,0);
+        board.setValueElementFromBoard(8,2,0);
+
+        //When
+        SudokuBoard deepCopyOfBoard = new SudokuBoard();
+        try {
+            deepCopyOfBoard = board.deepCopy();
+            System.out.println(deepCopyOfBoard.getNumberOfCopy());
+            System.out.println(deepCopyOfBoard.getName());
+            System.out.println(deepCopyOfBoard);
+        } catch (CloneNotSupportedException e) {
+
+        }
+
+        //Then
+        Assertions.assertEquals(board.getName(), deepCopyOfBoard.getName());
+        Assertions.assertEquals(board.getNumberOfCopy() + 1, deepCopyOfBoard.getNumberOfCopy());
+        Assertions.assertEquals(board.getSudokuBoardList(), deepCopyOfBoard.getSudokuBoardList());
+    }
+
 }
 
 }

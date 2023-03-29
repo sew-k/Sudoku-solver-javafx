@@ -5,6 +5,7 @@ import com.kodilla.sudokujavafx.data.SudokuElement;
 import com.kodilla.sudokujavafx.presentation.Drawer;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -14,6 +15,8 @@ public enum GameProcessor {
     private Drawer drawer = Drawer.INSTANCE;
     private SudokuBoard board;
     private static GameDifficulty difficulty = GameDifficulty.EASY;
+    private List<SudokuBoard> backTrackList = new ArrayList<>();
+
     private GameProcessor() {
     }
     public void processGame(Stage stage, SudokuBoard board) {
@@ -67,9 +70,37 @@ public enum GameProcessor {
             solvedElement.setFieldValue(availableFieldValuesList
                     .get(random.nextInt(0, availableFieldValuesList.size())));
             board.setValueElementFromBoard(solvedElement.getFieldValue(), solvedElement.getRowIndex(), solvedElement.getColIndex());
+            addCurrentBoardToBackTrackList();
         } else {
             System.out.println("Unable to solve!");    //TODO - handle this situation
         }
+    }
+
+    public void addCurrentBoardToBackTrackList() {
+        backTrackList.add(getBoard().getNumberOfCopy(), getBoard());
+        try {
+            setBoard(getBoard().deepCopy());
+        } catch (CloneNotSupportedException e) {
+            System.out.println("Exception when trying to clone current board: " + e);
+        }
+    }
+
+    public void setPreviousBoard() {
+        setBoard(getBackTrackList().get(getBoard().getNumberOfCopy() - 1));
+    }
+
+    public void setNextBoard() {
+        if ((getBackTrackList().contains(getBoard().getNumberOfCopy() + 1))) {
+            setBoard(getBackTrackList().get(getBoard().getNumberOfCopy() + 1));
+        }
+    }
+
+    public List<SudokuBoard> getBackTrackList() {
+        return backTrackList;
+    }
+
+    public void setBackTrackList(List<SudokuBoard> backTrackList) {
+        this.backTrackList = backTrackList;
     }
 
     public SudokuBoard solveSudokuBoard(SudokuBoard board) {

@@ -178,6 +178,14 @@ public enum Drawer {
         Button undoButton = new Button("<");
         undoButton.setMinSize(50,50);
         undoButton.setMaxSize(50,50);
+        undoButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                GameProcessor.INSTANCE.setPreviousBoard();
+                System.out.println(GameProcessor.INSTANCE.getBoard());
+                drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
+            }
+        });
         undoButton.setTooltip(new Tooltip("Undo last move"));
         Button solveOneFieldButton = new Button(">");
         solveOneFieldButton.setMinSize(50,50);

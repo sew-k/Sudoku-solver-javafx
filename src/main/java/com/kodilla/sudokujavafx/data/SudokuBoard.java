@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class SudokuBoard {
+public class SudokuBoard implements Cloneable {
     private String name;
     private int numberOfCopy;
     private List<SudokuRow> sudokuBoardList;
@@ -30,6 +30,26 @@ public class SudokuBoard {
             sudokuBoardList.add(new SudokuRow(i));
         }
         setNumberOfCopy(0);
+    }
+
+    public SudokuBoard deepCopy() throws CloneNotSupportedException {
+        SudokuBoard copyOfBoard = (SudokuBoard) this.clone();
+        copyOfBoard.setNumberOfCopy(this.getNumberOfCopy() + 1);
+        copyOfBoard.setName(this.getName());
+        copyOfBoard.sudokuBoardList = new ArrayList<>();
+        for (SudokuRow row : getSudokuBoardList()) {
+            //List<SudokuElement> copyOfSudokuElementList = new ArrayList<>();
+            SudokuRow copyOfRow = new SudokuRow(row.getRowNumber());
+            for (SudokuElement element : row.getSudokuElementsList()) {
+                SudokuElement copyOfElement = new SudokuElement(element.getFieldValue(),
+                        element.getRowIndex(), element.getColIndex(),
+                        element.getAvailableFieldValues(), element.isFixed());
+                copyOfRow.getSudokuElementsList().set(element.getColIndex(), copyOfElement);
+                //copyOfRow.getSudokuElementsList().add(copyOfElement);
+            }
+            copyOfBoard.getSudokuBoardList().add(copyOfRow);
+        }
+        return copyOfBoard;
     }
 
     public String getName() {
