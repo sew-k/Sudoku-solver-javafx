@@ -86,11 +86,7 @@ class SudokuBoardTests {
         SudokuBoard deepCopyOfBoard = new SudokuBoard();
         try {
             deepCopyOfBoard = board.deepCopy();
-            System.out.println(deepCopyOfBoard.getNumberOfCopy());
-            System.out.println(deepCopyOfBoard.getName());
-            System.out.println(deepCopyOfBoard);
         } catch (CloneNotSupportedException e) {
-
         }
 
         //Then

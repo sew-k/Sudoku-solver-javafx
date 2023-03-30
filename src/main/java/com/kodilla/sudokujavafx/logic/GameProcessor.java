@@ -5,17 +5,16 @@ import com.kodilla.sudokujavafx.data.SudokuElement;
 import com.kodilla.sudokujavafx.presentation.Drawer;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public enum GameProcessor {
     INSTANCE;
     private Drawer drawer = Drawer.INSTANCE;
-    private SudokuBoard board;
+    private SudokuBoard board = new SudokuBoard();
     private static GameDifficulty difficulty = GameDifficulty.EASY;
-    private List<SudokuBoard> backTrackList = new ArrayList<>();
+    //private List<SudokuBoard> backTrackList = new ArrayList<>();
+    private Deque<SudokuBoard> backTrack = new ArrayDeque<>();
 
     private GameProcessor() {
     }
@@ -25,7 +24,19 @@ public enum GameProcessor {
     }
     public void processGame(Stage stage) {
         board = new SudokuBoard();
+        //addBoardToBackTrack(board);
         drawer.drawMainWindow(stage, board);
+    }
+
+    public void addBoardToBackTrack(SudokuBoard board) {
+
+        if (backTrack.add(board)) {
+            System.out.println("Added board " +
+                    getBoard().getName() + " [copy #" +
+                    getBoard().getNumberOfCopy() +
+                    "] to backTrack");
+            System.out.println("There are [" + getBackTrack().size() + "] elements in backtrack");
+        }
     }
 
     public void exitGame(Stage stage) {
@@ -38,6 +49,7 @@ public enum GameProcessor {
 
     public void setBoard(SudokuBoard board) {
         this.board = board;
+        System.out.println("Board '" + getBoard().getName() + " /#" + getBoard().getNumberOfCopy() + "' set as current");
     }
 
     public static GameDifficulty getDifficulty() {
@@ -50,6 +62,7 @@ public enum GameProcessor {
 
     public void solveRandomSudokuElement(SudokuBoard board) {
         board.calculateBoard();
+        addBoardToBackTrack(getCopyOfBoard(board));
         List<SudokuElement> unsolvedSudokuElementList = board.getUnsolvedSudokuElements();
         Random random = new Random();
         SudokuElement solvedElement;
@@ -70,37 +83,65 @@ public enum GameProcessor {
             solvedElement.setFieldValue(availableFieldValuesList
                     .get(random.nextInt(0, availableFieldValuesList.size())));
             board.setValueElementFromBoard(solvedElement.getFieldValue(), solvedElement.getRowIndex(), solvedElement.getColIndex());
-            addCurrentBoardToBackTrackList();
+
+            //setBoard(getCopyOfBoard(board));
+
         } else {
             System.out.println("Unable to solve!");    //TODO - handle this situation
         }
     }
 
-    public void addCurrentBoardToBackTrackList() {
-        backTrackList.add(getBoard().getNumberOfCopy(), getBoard());
+//    public void addCurrentBoardToBackTrackList() {
+//            backTrackList.add(getBoard());
+//            System.out.println("Added board " + getBoard().getName() + " [copy #" + getBoard().getNumberOfCopy() + "] to backTrackList");
+//    }
+    public void setNextCopyOfBoardAsCurrent() {
         try {
-            setBoard(getBoard().deepCopy());
+            SudokuBoard copyOfBoard = getBoard().deepCopy();
+            //backTrackList.add(copyOfBoard.getNumberOfCopy(), copyOfBoard);
+            //
+            // backTrackList.add(copyOfBoard);
+            setBoard(copyOfBoard);
+            System.out.println("Current board is: " + copyOfBoard.getName() + " [copy #" + copyOfBoard.getNumberOfCopy() + "]");
         } catch (CloneNotSupportedException e) {
             System.out.println("Exception when trying to clone current board: " + e);
         }
     }
-
-    public void setPreviousBoard() {
-        setBoard(getBackTrackList().get(getBoard().getNumberOfCopy() - 1));
-    }
-
-    public void setNextBoard() {
-        if ((getBackTrackList().contains(getBoard().getNumberOfCopy() + 1))) {
-            setBoard(getBackTrackList().get(getBoard().getNumberOfCopy() + 1));
+    public SudokuBoard getCopyOfBoard(SudokuBoard board) {
+        try {
+            SudokuBoard copyOfBoard = board.deepCopy();
+            System.out.println("Board: " + board.getName() + " [copy #" + board.getNumberOfCopy() + "] copied:");
+            System.out.println(" - " + copyOfBoard.getName() + " [copy #" + copyOfBoard.getNumberOfCopy() + "]");
+            return copyOfBoard;
+        } catch (CloneNotSupportedException e) {
+            System.out.println("Exception when trying to clone current board: " + e);
+            return null;
         }
     }
 
-    public List<SudokuBoard> getBackTrackList() {
-        return backTrackList;
+    public void setPreviousBoard() {
+//        try {
+//            SudokuBoard previousBoard = getBackTrack().pollLast();
+//            setBoard(previousBoard);
+//        } catch (IndexOutOfBoundsException e) {
+//            System.out.println("There is no board in backtrack! (" + e + ")");
+//        }
+            SudokuBoard previousBoard = getBackTrack().pollLast();
+            if (previousBoard != null) {
+                setBoard(previousBoard);
+            }
     }
 
-    public void setBackTrackList(List<SudokuBoard> backTrackList) {
-        this.backTrackList = backTrackList;
+    public void setNextBoard() {
+
+    }
+
+    public Deque<SudokuBoard> getBackTrack() {
+        return backTrack;
+    }
+
+    public void setBackTrackList(Deque<SudokuBoard> backTrackList) {
+        this.backTrack = backTrackList;
     }
 
     public SudokuBoard solveSudokuBoard(SudokuBoard board) {
