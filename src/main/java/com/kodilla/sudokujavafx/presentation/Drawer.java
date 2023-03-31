@@ -129,8 +129,9 @@ public enum Drawer {
                 fileChooser.setTitle("Load board");
                 File file = fileChooser.showOpenDialog(stage);
                 if (file != null) {
-                    board.loadBoard(file);
-                    GameProcessor.INSTANCE.getBoard().setName(file.getName());
+                    SudokuBoard newBoard = board.loadBoard(file);
+                    GameProcessor.INSTANCE.getBackTrack().clear();
+                    GameProcessor.INSTANCE.setBoard(newBoard);
                     drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
                 }
             }
@@ -198,11 +199,20 @@ public enum Drawer {
                 drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
             }
         });
-        solveOneFieldButton.setTooltip(new Tooltip("Solve one random\n field from this\n board"));
+        solveOneFieldButton.setTooltip(new Tooltip("Solve one random\n field from this\n board by CPU"));
         Button solveButton = new Button(">>");
         solveButton.setMinSize(50,50);
         solveButton.setMaxSize(50,50);
-        solveButton.setTooltip(new Tooltip("Solve this board"));
+        solveButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                SudokuBoard solvedBoard = GameProcessor.INSTANCE.solveSudokuBoard(board);
+                GameProcessor.INSTANCE.setBoard(solvedBoard);
+                System.out.println(GameProcessor.INSTANCE.getBoard());
+                drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
+            }
+        });
+        solveButton.setTooltip(new Tooltip("Solve this board by CPU"));
         Button clearButton = new Button("X");
         clearButton.setMinSize(50,50);
         clearButton.setMaxSize(50,50);
@@ -218,7 +228,7 @@ public enum Drawer {
         Button randomBoardButton = new Button("?");
         randomBoardButton.setMinSize(50,50);
         randomBoardButton.setMaxSize(50,50);
-        randomBoardButton.setTooltip(new Tooltip("Clear and set\n new random board"));
+        randomBoardButton.setTooltip(new Tooltip("Clear and set\n new random board\n based on difficulty settings"));
         HBox buttonsHBox = new HBox(undoButton, solveOneFieldButton, solveButton, clearButton, randomBoardButton);
         buttonsHBox.setAlignment(Pos.CENTER);
         root.getChildren().add(menuBar);

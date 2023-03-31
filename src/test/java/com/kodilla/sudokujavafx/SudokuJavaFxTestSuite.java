@@ -95,6 +95,44 @@ class SudokuBoardTests {
         Assertions.assertEquals(board.getSudokuBoardList(), deepCopyOfBoard.getSudokuBoardList());
     }
 
+    @Test
+    void testIsBoardCorrectWhenNot() {
+        //Given
+        SudokuBoard board = new SudokuBoard();
+        board.calculateBoard();
+        board.setValueElementFromBoard(1,0,0);
+        board.calculateBoard();
+        board.setValueElementFromBoard(1,0,1);
+
+        //When
+
+        boolean result = board.isBoardCorrect();
+
+        //Then
+        Assertions.assertFalse(result);
+    }
+    @Test
+    void testIsBoardCorrectWhenCorrect() {
+        //Given
+        SudokuBoard board = new SudokuBoard();
+        board.calculateBoard();
+        board.setValueElementFromBoard(1,0,0);
+        board.calculateBoard();
+        board.setValueElementFromBoard(2,0,1);
+        System.out.println(board);
+//        System.out.println("0,1: " + board.getElementFromBoard(0,1).isElementValueCorrect());
+//        System.out.println("0,1: " + board.getElementFromBoard(0,1).getAvailableFieldValues());
+//        System.out.println("0,0: " + board.getElementFromBoard(0,0).isElementValueCorrect());
+//        System.out.println("0,0: " + board.getElementFromBoard(0,0).getAvailableFieldValues());
+
+        //When
+        boolean result = board.isBoardCorrect();
+
+        //Then
+        Assertions.assertTrue(result);
+
+    }
+
 }
 
 }

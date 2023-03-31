@@ -91,16 +91,11 @@ public enum GameProcessor {
         }
     }
 
-//    public void addCurrentBoardToBackTrackList() {
-//            backTrackList.add(getBoard());
-//            System.out.println("Added board " + getBoard().getName() + " [copy #" + getBoard().getNumberOfCopy() + "] to backTrackList");
-//    }
+
     public void setNextCopyOfBoardAsCurrent() {
         try {
             SudokuBoard copyOfBoard = getBoard().deepCopy();
-            //backTrackList.add(copyOfBoard.getNumberOfCopy(), copyOfBoard);
-            //
-            // backTrackList.add(copyOfBoard);
+
             setBoard(copyOfBoard);
             System.out.println("Current board is: " + copyOfBoard.getName() + " [copy #" + copyOfBoard.getNumberOfCopy() + "]");
         } catch (CloneNotSupportedException e) {
@@ -120,12 +115,7 @@ public enum GameProcessor {
     }
 
     public void setPreviousBoard() {
-//        try {
-//            SudokuBoard previousBoard = getBackTrack().pollLast();
-//            setBoard(previousBoard);
-//        } catch (IndexOutOfBoundsException e) {
-//            System.out.println("There is no board in backtrack! (" + e + ")");
-//        }
+
             SudokuBoard previousBoard = getBackTrack().pollLast();
             if (previousBoard != null) {
                 setBoard(previousBoard);
@@ -145,6 +135,14 @@ public enum GameProcessor {
     }
 
     public SudokuBoard solveSudokuBoard(SudokuBoard board) {
-        return null;
+        while (!board.isBoardSolved()) {
+            solveRandomSudokuElement(board);
+            if (board.getPossibleSolveCombination() == 0) {
+                do {
+                    board = getBackTrack().pollLast();
+                } while (!(board.getPossibleSolveCombination() > 1));
+            }
+        }
+        return board;
     }
 }

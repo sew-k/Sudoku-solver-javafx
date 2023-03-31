@@ -193,6 +193,7 @@ public class SudokuBoard implements Cloneable {
     public void calculateBoard() {
         getSudokuBoardList().stream()
                 .flatMap(l -> l.getSudokuElementsList().stream())
+                .filter(v -> v.getFieldValue() == 0)
                 .forEach(e -> e.calculateAvailableFieldValues(this));
     }
 
@@ -241,7 +242,7 @@ public class SudokuBoard implements Cloneable {
         return newBoard;
     }
 
-    public void loadBoard(File file) {
+    public SudokuBoard loadBoard(File file) {
         System.out.println(file);
         try {
             System.out.println("Loading the board");
@@ -254,13 +255,16 @@ public class SudokuBoard implements Cloneable {
             }
             System.out.println(newString);
             SudokuBoard newBoard = setBoardFromString(newString);
+            newBoard.setName(file.getName());
+            newBoard.setNumberOfCopy(0);
             System.out.println("board");
             System.out.println(newBoard);
-            GameProcessor.INSTANCE.setBoard(newBoard);
-            System.out.println("Successful loaded board: \n" + GameProcessor.INSTANCE.getBoard());
-
+            //GameProcessor.INSTANCE.setBoard(newBoard);
+            //System.out.println("Successful loaded board: \n" + GameProcessor.INSTANCE.getBoard());
+            return newBoard;
         } catch (IOException e) {
             System.out.println("Exception:" + e);
+            return null;
         }
     }
     public void saveBoard(File file, SudokuBoard board) throws IOException {
@@ -297,5 +301,22 @@ public class SudokuBoard implements Cloneable {
         return numberAvailableFieldValuesForElements.stream()
                 .mapToInt(v -> v)
                 .min().orElse(-1);         //TODO if -1 means sudoku solved, if 0 - sudoku unable to solve
+    }
+
+    public boolean isBoardCorrect() {
+        return getSudokuBoardList().stream()
+                .flatMap(r -> r.getSudokuElementsList().stream())
+                .filter(v -> v.getFieldValue() != 0)
+                .map(e -> e.isElementValueCorrect())
+                .noneMatch(p -> p == false);
+    }
+
+    public boolean isBoardSolved() {
+        List<SudokuElement> unsolvedElements = getUnsolvedSudokuElements();
+        if ((unsolvedElements.size() == 0) && (isBoardCorrect())) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
