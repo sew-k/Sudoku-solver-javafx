@@ -1,19 +1,14 @@
 package com.kodilla.sudokujavafx.data;
 
-import com.kodilla.sudokujavafx.logic.GameProcessor;
 import com.kodilla.sudokujavafx.logic.Validator;
-import javafx.scene.control.MenuItem;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class SudokuBoard implements Cloneable {
     private String name;
@@ -231,8 +226,8 @@ public class SudokuBoard implements Cloneable {
                     boolean fixed = true;
                     if (elementValue == 0) fixed = false;
                     newBoard.setValueElementFromBoard(elementValue, row, col, fixed);
-                    System.out.println("elementValue: " + elementValue);
-                    System.out.println("i: " + i);
+                    //System.out.println("elementValue: " + elementValue);
+                    //System.out.println("i: " + i);
                     i++;
                 } else {
                     throw new IOException("*** invalid element value at [" + i + "] ***");
@@ -288,7 +283,7 @@ public class SudokuBoard implements Cloneable {
                 .collect(Collectors.toList());
     }
 
-    public int getPossibleSolveCombination() {
+    public int getNumberOfSolutions() {
         calculateBoard();
         List<Integer> numberAvailableFieldValuesForElements = getSudokuBoardList().stream()
                 .flatMap(b -> b.getSudokuElementsList().stream())

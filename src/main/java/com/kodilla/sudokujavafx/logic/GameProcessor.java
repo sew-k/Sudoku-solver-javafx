@@ -2,6 +2,7 @@ package com.kodilla.sudokujavafx.logic;
 
 import com.kodilla.sudokujavafx.data.SudokuBoard;
 import com.kodilla.sudokujavafx.data.SudokuElement;
+import com.kodilla.sudokujavafx.data.SudokuMove;
 import com.kodilla.sudokujavafx.presentation.Drawer;
 import javafx.stage.Stage;
 
@@ -14,7 +15,7 @@ public enum GameProcessor {
     private SudokuBoard board = new SudokuBoard();
     private static GameDifficulty difficulty = GameDifficulty.EASY;
     //private List<SudokuBoard> backTrackList = new ArrayList<>();
-    private Deque<SudokuBoard> backTrack = new ArrayDeque<>();
+    private Deque<SudokuMove> backTrack = new ArrayDeque<>();
 
     private GameProcessor() {
     }
@@ -28,13 +29,13 @@ public enum GameProcessor {
         drawer.drawMainWindow(stage, board);
     }
 
-    public void addBoardToBackTrack(SudokuBoard board) {
-
-        if (backTrack.add(board)) {
+    public void addMoveToBackTrack(SudokuBoard board, SudokuElement element, int newValue) {
+        SudokuMove move = new SudokuMove(board, element, newValue);
+        if (backTrack.add(move)) {
             System.out.println("Added board " +
                     getBoard().getName() + " [copy #" +
                     getBoard().getNumberOfCopy() +
-                    "] to backTrack");
+                    "] and move on element " + element + ", with new value: " + newValue + " to backTrack");
             System.out.println("There are [" + getBackTrack().size() + "] elements in backtrack");
         }
     }
@@ -61,8 +62,9 @@ public enum GameProcessor {
     }
 
     public void solveRandomSudokuElement(SudokuBoard board) {
-        board.calculateBoard();
-        addBoardToBackTrack(getCopyOfBoard(board));
+        //board.calculateBoard();
+        SudokuBoard boardCopyToBacktrack = getCopyOfBoard(board);
+        //addMoveToBackTrack(getCopyOfBoard(board), );
         List<SudokuElement> unsolvedSudokuElementList = board.getUnsolvedSudokuElements();
         Random random = new Random();
         SudokuElement solvedElement;
@@ -84,6 +86,7 @@ public enum GameProcessor {
                     .get(random.nextInt(0, availableFieldValuesList.size())));
             board.setValueElementFromBoard(solvedElement.getFieldValue(), solvedElement.getRowIndex(), solvedElement.getColIndex());
 
+            addMoveToBackTrack(boardCopyToBacktrack, solvedElement, solvedElement.getFieldValue());
             //setBoard(getCopyOfBoard(board));
 
         } else {
@@ -116,31 +119,58 @@ public enum GameProcessor {
 
     public void setPreviousBoard() {
 
-            SudokuBoard previousBoard = getBackTrack().pollLast();
-            if (previousBoard != null) {
+            if (getBackTrack().size() > 0) {
+                SudokuBoard previousBoard = getBackTrack().pollLast().getBoard();
                 setBoard(previousBoard);
             }
+
     }
 
     public void setNextBoard() {
 
     }
 
-    public Deque<SudokuBoard> getBackTrack() {
+    public Deque<SudokuMove> getBackTrack() {
         return backTrack;
     }
 
-    public void setBackTrackList(Deque<SudokuBoard> backTrackList) {
-        this.backTrack = backTrackList;
+    public void setBackTrackList(Deque<SudokuMove> backTrack) {
+        this.backTrack = backTrack;
     }
 
     public SudokuBoard solveSudokuBoard(SudokuBoard board) {
         while (!board.isBoardSolved()) {
             solveRandomSudokuElement(board);
-            if (board.getPossibleSolveCombination() == 0) {
-                do {
-                    board = getBackTrack().pollLast();
-                } while (!(board.getPossibleSolveCombination() > 1));
+            if (board.getNumberOfSolutions() == 0) {
+                boolean end = false;
+
+                while (!end) {
+                    //SudokuMove move = getBackTrack().pollFirst();
+                    SudokuMove move = getBackTrack().pollLast();
+
+                    if ((getBackTrack().size() == 0) || (move.getBoard().getNumberOfSolutions() > 1)) {
+                        end = true;
+                        board = move.getBoard();
+                        System.out.println("picked board with [" + board.getNumberOfSolutions() + "] number of solutions");
+                        int row = move.getElement().getRowIndex();
+                        int col = move.getElement().getColIndex();
+                        int val = move.getNewValue();
+                        board.getSudokuBoardList().get(row).getSudokuElementsList().get(col).addValueToFalseFieldValues(val);
+
+                        //TODO - how to save that value to sudoku Element ?
+                    }
+                }
+
+            }
+        }
+        return board;
+    }
+    public SudokuBoard simpleSolveSudokuBoard(SudokuBoard board) {
+        while (!board.isBoardSolved()) {
+            solveRandomSudokuElement(board);
+            if (board.getNumberOfSolutions() == 0) {
+                board = getBackTrack().pollFirst().getBoard();
+                getBackTrack().clear();
             }
         }
         return board;

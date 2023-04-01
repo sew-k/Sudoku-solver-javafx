@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 public class SudokuElement {
     private int fieldValue;
     private Set<Integer> availableFieldValues;
+    private Set<Integer> falseFieldValues = new HashSet<>();
+
     private int rowIndex;
     private int colIndex;
     private boolean fixed;
@@ -44,6 +46,7 @@ public class SudokuElement {
     public SudokuElement(int fieldValue, int rowIndex, int colIndex) {
         this.fieldValue = fieldValue;
         availableFieldValues = new HashSet<>(Set.of(0,1,2,3,4,5,6,7,8,9));
+        falseFieldValues = new HashSet<>();
         this.rowIndex = rowIndex;
         this.colIndex = colIndex;
     }
@@ -55,9 +58,23 @@ public class SudokuElement {
         this.fixed = fixed;
     }
 
+    public Set<Integer> getFalseFieldValues() {
+        return falseFieldValues;
+    }
+
+    public void setFalseFieldValues(Set<Integer> falseFieldValues) {
+        this.falseFieldValues = falseFieldValues;
+    }
+    public void addValueToFalseFieldValues(int value) {
+        if (getFalseFieldValues().add(value)) {
+            System.out.println("- added value " + value + " to falseFieldValues in Element: " + this);
+        }
+    }
+
     @Override
     public String toString() {
-        return Integer.toString(fieldValue);
+
+        return "[" + getRowIndex() + ";" + getColIndex() + "]:" + Integer.toString(fieldValue);
     }
 
     public int getFieldValue() {
@@ -86,6 +103,7 @@ public class SudokuElement {
         Set<Integer> actualSubBoardSet = board.getSubBoardValues(rowIndex, colIndex).stream()
                         .collect(Collectors.toSet());
         resultValues.removeAll(actualSubBoardSet);
+        resultValues.removeAll(falseFieldValues);
         setAvailableFieldValues(resultValues);
     }
     public Set getAvailableFieldValues(SudokuBoard board) {

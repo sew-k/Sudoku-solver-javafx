@@ -2,29 +2,24 @@ package com.kodilla.sudokujavafx.presentation;
 
 import com.kodilla.sudokujavafx.data.SudokuBoard;
 import com.kodilla.sudokujavafx.data.SudokuElement;
-import com.kodilla.sudokujavafx.data.SudokuRow;
 import com.kodilla.sudokujavafx.logic.GameDifficulty;
 import com.kodilla.sudokujavafx.logic.GameProcessor;
 import com.kodilla.sudokujavafx.logic.Validator;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.controlsfx.control.action.Action;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 public enum Drawer {
     INSTANCE;
@@ -172,7 +167,7 @@ public enum Drawer {
         menuBar.getMenus().addAll(game, boardMenu, settings);
 
         String fileName = GameProcessor.INSTANCE.getBoard().getName();
-        int numberOfPossibleCombinations = board.getPossibleSolveCombination();
+        int numberOfPossibleCombinations = board.getNumberOfSolutions();
         Label topLabel = new Label("Board name: '" + fileName + "'.  Possible combinations: " + numberOfPossibleCombinations);
 
         VBox root = new VBox();
