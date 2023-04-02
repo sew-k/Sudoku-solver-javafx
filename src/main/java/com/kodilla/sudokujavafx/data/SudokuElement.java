@@ -131,10 +131,14 @@ public class SudokuElement {
     }
 
     public boolean isElementValueCorrect() {
-        if (getAvailableFieldValues().contains(getFieldValue())) {
-            return true;
+        if (!isFixed()) {
+            if (getAvailableFieldValues().contains(getFieldValue())) {
+                return true;
+            } else {
+                return false;
+            }
         } else {
-            return false;
+            return true;
         }
     }
 }

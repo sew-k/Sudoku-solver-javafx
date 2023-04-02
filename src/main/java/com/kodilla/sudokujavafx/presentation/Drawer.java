@@ -158,6 +158,11 @@ public enum Drawer {
                     GameProcessor.INSTANCE.getBackTrack().clear();
                     GameProcessor.INSTANCE.setBoard(newBoard);
                     drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
+                    GameProcessor.INSTANCE.findAllSolutions(GameProcessor.INSTANCE.getBoard());
+                    System.out.println("NUMBER OF SOLUTIONS" + GameProcessor.INSTANCE.getSolvedBoardsList().size());
+                    for (SudokuBoard board : GameProcessor.INSTANCE.getSolvedBoardsList()) {
+                        System.out.println(board);
+                    }
                 }
             }
         });
@@ -199,7 +204,7 @@ public enum Drawer {
 
         String fileName = GameProcessor.INSTANCE.getBoard().getName();
         int numberOfPossibleCombinations = board.getNumberOfSolutions();
-        Label topLabel = new Label("Board name: '" + fileName + "'.  Possible combinations: " + numberOfPossibleCombinations);
+        Label topLabel = new Label("Board name: '" + fileName + "'.  Minimum possible moves: " + numberOfPossibleCombinations);
 
         VBox root = new VBox();
         Button restartButton = new Button("<<");

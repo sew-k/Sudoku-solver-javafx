@@ -312,12 +312,22 @@ public class SudokuBoard implements Cloneable {
     }
 
     public boolean isBoardCorrect() {
+
         return getSudokuBoardList().stream()
                 .flatMap(r -> r.getSudokuElementsList().stream())
                 .filter(v -> v.getFieldValue() != 0)
-                .map(e -> e.isElementValueCorrect())
-                .noneMatch(p -> p == false);
+                .map(f -> f.isElementValueCorrect())
+                .filter(c -> c == false)
+                .findAny().orElse(true);
     }
+
+//    public boolean isBoardCorrect() {
+//        return getSudokuBoardList().stream()
+//                .flatMap(r -> r.getSudokuElementsList().stream())
+//                .filter(v -> v.getFieldValue() != 0)
+//                .map(e -> e.isElementValueCorrect())
+//                .noneMatch(p -> p == false);
+//    }
 
     public boolean isBoardSolved() {
         List<SudokuElement> unsolvedElements = getUnsolvedSudokuElements();
