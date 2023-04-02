@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class SudokuBoard implements Cloneable {
@@ -58,6 +59,19 @@ public class SudokuBoard implements Cloneable {
             copyOfBoard.getSudokuBoardList().add(copyOfRow);
         }
         return copyOfBoard;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SudokuBoard that = (SudokuBoard) o;
+        return toString().equals(that.toString());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(toString());
     }
 
     public String getName() {
@@ -302,8 +316,7 @@ public class SudokuBoard implements Cloneable {
                 .flatMap(b -> b.getSudokuElementsList().stream())
                 .filter(x -> !x.isFixed())
                 .filter(y ->  y.getFieldValue() == 0)
-                .map(e -> e.getAvailableFieldValues())
-                .map(s -> s.size())
+                .map(e -> e.getAvailableFieldValues().size())
                 .collect(Collectors.toList());
 
         return numberAvailableFieldValuesForElements.stream()

@@ -19,6 +19,7 @@ public enum GameProcessor {
     private Deque<SudokuMove> backTrack = new ArrayDeque<>();
     private Deque<SudokuBoard> backTrackOfBoards = new ArrayDeque<>();
     private List<SudokuBoard> solvedBoardsList = new ArrayList<>();
+    private List<SudokuBoard> falseBoardsList = new ArrayList<>();
 
     private GameProcessor() {
     }
@@ -31,6 +32,13 @@ public enum GameProcessor {
         drawer.drawMainWindow(stage, board);
     }
 
+    public List<SudokuBoard> getFalseBoardsList() {
+        return falseBoardsList;
+    }
+
+    public void setFalseBoardsList(List<SudokuBoard> falseBoardsList) {
+        this.falseBoardsList = falseBoardsList;
+    }
 
     public void addMoveToBackTrack(SudokuMove move) {
         if (backTrack.add(move)) {
@@ -133,7 +141,40 @@ public enum GameProcessor {
         }
     }
 
+    public void solveRandomSudokuElementForCPU(SudokuBoard board) {
+        //board.calculateBoard();
+        //SudokuBoard boardCopyToBacktrack = getCopyOfBoard(board);
+        List<SudokuElement> unsolvedSudokuElementList = board.getUnsolvedSudokuElements();
+        Random random = new Random();
+        SudokuElement solvedElement;
 
+
+        SudokuElement elementOneAvailableValue = unsolvedSudokuElementList.stream()
+                .filter(e -> e.getAvailableFieldValues().size() == 1)
+                .findFirst().orElse(null);
+
+        if (elementOneAvailableValue != null) {
+            solvedElement = elementOneAvailableValue;
+        }
+
+//        if ((solvedElement != null) && (solvedElement.getAvailableFieldValues().size() > 0))  {
+//            List<Integer> availableFieldValuesList = solvedElement.getAvailableFieldValues().stream()
+//                    .collect(Collectors.toList());
+//            solvedElement.setFieldValue(availableFieldValuesList
+//                    .get(random.nextInt(0, availableFieldValuesList.size())));
+//            board.setValueElementFromBoard(solvedElement.getFieldValue(), solvedElement.getRowIndex(), solvedElement.getColIndex());
+
+//
+//
+//            addMoveToBackTrack();
+//
+//
+//            System.out.println("Element: " + solvedElement + " - available set - " + solvedElement.getAvailableFieldValues());
+//
+//        } else {
+//            System.out.println("Unable to solve!");    //TODO - handle this situation
+//        }
+    }
     public void setNextCopyOfBoardAsCurrent() {
         try {
             SudokuBoard copyOfBoard = getBoard().deepCopy();
@@ -205,35 +246,85 @@ public enum GameProcessor {
 
     public SudokuElement solveElement(SudokuElement element) {
         if (element.getAvailableFieldValues().size() > 0) {
+
             Random random = new Random();
             List<Integer> availableFieldValuesList = element.getAvailableFieldValues().stream()
                     .collect(Collectors.toList());
             element.setFieldValue(availableFieldValuesList
                     .get(random.nextInt(0, availableFieldValuesList.size())));
+            //System.out.println("element: " + element + " possible values: " + element.getAvailableFieldValues());
             return element;
         } else {
             element.setFieldValue(0);
             return element;
         }
     }
+//    public SudokuBoard solveSudokuBoard(SudokuBoard board) {
+//
+//        if (board.isBoardSolved()) {
+//            getSolvedBoardsList().add(board);
+//            System.out.println();
+//            System.out.println(" !!! board saved to solved list ");
+//            System.out.println(" !!! solved boards list has: " + getSolvedBoardsList().size() + " elements");
+//            System.out.println();
+//            return board;
+//
+//        } else {
+//            if (board.getNumberOfSolutions() == 1) {
+//                solveRandomSudokuElement(board);
+//                solveSudokuBoard(board);
+//            } else if (board.getNumberOfSolutions() > 1) {
+//                solveRandomSudokuElement(board);
+//                solveSudokuBoard(board);
+//
+//            } else if (board.getNumberOfSolutions() == 0) {
+//                board = getBackTrackOfBoards().pollLast();
+//                while (getBackTrackOfBoards().peekLast().getNumberOfSolutions() == 1)
+//                board.calculateBoard();
+//                board = solveSudokuBoard(board);
+//            }
+//        }
+//        return board;
+//    }
     public SudokuBoard solveSudokuBoard(SudokuBoard board) {
-
+        board.calculateBoard();
         if (board.isBoardSolved()) {
             getSolvedBoardsList().add(board);
             System.out.println();
             System.out.println(" !!! board saved to solved list ");
             System.out.println(" !!! solved boards list has: " + getSolvedBoardsList().size() + " elements");
             System.out.println();
-            //return board;
+            return board;
+
         } else {
             if (board.getNumberOfSolutions() == 1) {
                 System.out.println("number of solutions : " + board.getNumberOfSolutions());
-                board.getSudokuBoardList().stream()
+//                board.getSudokuBoardList().stream()
+//                        .flatMap(l -> l.getSudokuElementsList().stream())
+//                        .filter(e -> e.getAvailableFieldValues().size() == 1)
+//                        .forEach(element -> solveElement(element));
+//                List<SudokuElement> elementsWithOneSolution = board.getSudokuBoardList().stream()
+//                                .flatMap(l -> l.getSudokuElementsList().stream())
+//                                .filter(e -> e.getAvailableFieldValues().size() == 1)
+//                                .collect(Collectors.toList());
+//                for (SudokuElement element : elementsWithOneSolution) {
+//                    board.calculateBoard();
+//                    element = solveElement(element);
+//                    board.setValueElementFromBoard(element.get);
+//                }
+
+                SudokuElement element = board.getSudokuBoardList().stream()
                         .flatMap(l -> l.getSudokuElementsList().stream())
-                        .filter(e -> e.getAvailableFieldValues().size() == 1)
-                        .forEach(element -> solveElement(element));
-                //board.calculateBoard();
-                board = solveSudokuBoard(board);
+                        .filter(e -> e.getAvailableFieldValues().size() == 1 && e.getFieldValue() == 0)
+                                .findFirst().orElse(null);
+                SudokuElement solvedElement = solveElement(element);
+                board.setValueElementFromBoard(solvedElement.getFieldValue(), solvedElement.getRowIndex(), solvedElement.getColIndex());
+                board.calculateBoard();
+                System.out.println(element);
+                System.out.println(solvedElement);
+                //return board;
+                //board = solveSudokuBoard(board);
+
             } else if (board.getNumberOfSolutions() > 1) {
                 System.out.println("number of solutions : " + board.getNumberOfSolutions());
                 int copyNumber = 0;
@@ -244,20 +335,35 @@ public enum GameProcessor {
                         copyOfBoard.setValueElementFromBoard(availableValue, element.getRowIndex(), element.getColIndex());
                         copyNumber = copyNumber + 1;
                         copyOfBoard.setNumberOfCopy(copyNumber);
-                        addBoardToBackTrack(copyOfBoard);
+                        if (!getFalseBoardsList().contains(copyOfBoard)) {
+                            addBoardToBackTrack(copyOfBoard);
+                        } else {
+                            System.out.println();
+                            System.out.println("REJECTED!!!");
+                            System.out.println(copyOfBoard);
+                            System.out.println();
+                        }
                     }
                 }
-                board = getBackTrackOfBoards().pollLast();
-                //board.calculateBoard();
-                board = solveSudokuBoard(board);
+                board = getBackTrackOfBoards().peekLast();
+                System.out.println("taken board [copy #" + board.getNumberOfCopy() + ", instance #" + board.getInstance() + "] now backtrack has " + getBackTrackOfBoards().size() + "records");
+//                board.calculateBoard();
+//                board = solveSudokuBoard(board);
 
             } else if (board.getNumberOfSolutions() == 0) {
                 System.out.println("number of solutions : " + board.getNumberOfSolutions());
                 board = getBackTrackOfBoards().pollLast();
-                //board.calculateBoard();
-                board = solveSudokuBoard(board);
+                if (getFalseBoardsList().add(board)) {
+                    System.out.println("board: \n" + board + "\nadded to falseList");
+                }
+                board = getBackTrackOfBoards().pollLast();
+                System.out.println("taken board [copy #" + board.getNumberOfCopy() + ", instance #" + board.getInstance() + "] now backtrack has " + getBackTrackOfBoards().size() + "records");
+//                board.calculateBoard();
+//                board = solveSudokuBoard(board);
             }
+            board = solveSudokuBoard(board);
         }
+
         return board;
     }
 
@@ -275,15 +381,17 @@ public enum GameProcessor {
     }
 
     public void findAllSolutions(SudokuBoard board) {
-        if (board.isBoardSolved()) {
-            getSolvedBoardsList().add(board);
-        } else {
+
             if (board.getNumberOfSolutions() == 1) {
                 board.getSudokuBoardList().stream()
                         .flatMap(l -> l.getSudokuElementsList().stream())
                         .filter(e -> e.getAvailableFieldValues().size() == 1)
                         .forEach(element -> solveElement(element));
                 board = solveSudokuBoard(board);
+                if (board.isBoardSolved()) {
+                    getSolvedBoardsList().add(board);
+                    System.out.println("added in number of sol 1");
+                }
             } else if (board.getNumberOfSolutions() > 1) {
                 int copyNumber = 0;
                 for (SudokuElement element : board.getUnsolvedSudokuElements()) {
@@ -296,17 +404,29 @@ public enum GameProcessor {
                         addBoardToBackTrack(copyOfBoard);
                     }
                 }
-                while (!getBackTrackOfBoards().isEmpty()) {
-                    board = getBackTrackOfBoards().pollLast();
-                    board = solveSudokuBoard(board);
+                board = getBackTrackOfBoards().pollLast();
+                board = solveSudokuBoard(board);
+                if (board.isBoardSolved()) {
+                    getSolvedBoardsList().add(board);
+                    System.out.println("added in number of sol > 1");
                 }
 
             } else if (board.getNumberOfSolutions() == 0) {
-                System.out.println("number of solutions : " + board.getNumberOfSolutions());
                 board = getBackTrackOfBoards().pollLast();
                 board = solveSudokuBoard(board);
+                if (board.isBoardSolved()) {
+                    getSolvedBoardsList().add(board);
+                    System.out.println("added in number of sol 0");
+                }
             }
-        }
+            if (getBackTrackOfBoards().size() > 0) {
+                board = getBackTrackOfBoards().pollLast();
+                board = solveSudokuBoard(board);
+                if (board.isBoardSolved()) {
+                    getSolvedBoardsList().add(board);
+                    System.out.println("added in number of sol backtrack > 0");
+                }
+            }
     }
 
 //    public SudokuBoard solveSudokuBoard(SudokuBoard board) {

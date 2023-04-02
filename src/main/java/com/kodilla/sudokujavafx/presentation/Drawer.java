@@ -158,11 +158,6 @@ public enum Drawer {
                     GameProcessor.INSTANCE.getBackTrack().clear();
                     GameProcessor.INSTANCE.setBoard(newBoard);
                     drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
-                    GameProcessor.INSTANCE.findAllSolutions(GameProcessor.INSTANCE.getBoard());
-                    System.out.println("NUMBER OF SOLUTIONS" + GameProcessor.INSTANCE.getSolvedBoardsList().size());
-                    for (SudokuBoard board : GameProcessor.INSTANCE.getSolvedBoardsList()) {
-                        System.out.println(board);
-                    }
                 }
             }
         });
