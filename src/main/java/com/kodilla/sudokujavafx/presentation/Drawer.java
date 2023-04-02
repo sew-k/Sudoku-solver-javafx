@@ -2,6 +2,7 @@ package com.kodilla.sudokujavafx.presentation;
 
 import com.kodilla.sudokujavafx.data.SudokuBoard;
 import com.kodilla.sudokujavafx.data.SudokuElement;
+import com.kodilla.sudokujavafx.data.SudokuMove;
 import com.kodilla.sudokujavafx.logic.GameDifficulty;
 import com.kodilla.sudokujavafx.logic.GameProcessor;
 import com.kodilla.sudokujavafx.logic.Validator;
@@ -30,10 +31,16 @@ public enum Drawer {
         GridPane gridPane = new GridPane();
         for (int r = 0; r < board.getSudokuBoardList().size(); r++) {
             for (int c = 0; c < board.getSudokuBoardList().get(r).getSudokuElementsList().size(); c++) {
-
                 TextField field = drawField(stage, board.getSudokuBoardList().get(r).getSudokuElementsList().get(c));
+                if (GameProcessor.getDifficulty().equals(GameDifficulty.EASY)) {
+                    String message = board.getElementFromBoard(r,c).getAvailableFieldValues().toString();
+                    if (message.equals("[]")) {
+                        message = "none available\nfield values";
+                    }
+                    Tooltip tooltip = new Tooltip(message);
+                    field.setTooltip(tooltip);
+                }
                 gridPane.add(field, c, r);
-
             }
         }
         return gridPane;
@@ -66,12 +73,22 @@ public enum Drawer {
                             field.setStyle("-fx-text-fill: BLUE; -fx-border-color: gray; -fx-font-size: 18");
                         }
                     }
+                    SudokuBoard copyBoardToBackTrack = null;
+                    try {
+                        copyBoardToBackTrack = GameProcessor.INSTANCE.getBoard().deepCopy();
+                    } catch (CloneNotSupportedException e) {
+
+                    }
                     sudokuElement.setFieldValue(Integer.parseInt(newValue));
                     System.out.println("textfield at row index " +
                             sudokuElement.getRowIndex() + "/ column index " +
                             sudokuElement.getColIndex() + "; changed from " +
                             oldValue + " to " + newValue + " : " + sudokuElement.getFieldValue());
                     System.out.println(GameProcessor.INSTANCE.getBoard());
+
+                    if (copyBoardToBackTrack != null) {
+                        GameProcessor.INSTANCE.addMoveToBackTrack(new SudokuMove(copyBoardToBackTrack, sudokuElement.getRowIndex(), sudokuElement.getColIndex(), sudokuElement.getFieldValue()));
+                    }
 
                     GameProcessor.INSTANCE.getBoard().calculateBoard();
 
@@ -102,8 +119,11 @@ public enum Drawer {
         MenuBar menuBar = new MenuBar();
         Menu game = new Menu("Game");
         MenuItem newGame = new MenuItem("New game");
+        newGame.setDisable(true);
         MenuItem loadGame = new MenuItem("Load game");
+        loadGame.setDisable(true);
         MenuItem saveGame = new MenuItem("Save game");
+        saveGame.setDisable(true);
         MenuItem exitGame = new MenuItem("Exit");
         exitGame.setOnAction(new EventHandler<ActionEvent>() {
              @Override
@@ -115,7 +135,17 @@ public enum Drawer {
 
         Menu boardMenu = new Menu("Board");
         MenuItem newRandomBoard = new MenuItem("New random board");
+        newRandomBoard.setDisable(true);
         MenuItem setBoardManually = new MenuItem("Set board manually");
+        setBoardManually.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                board.setAllElementsFixed();
+                GameProcessor.INSTANCE.setBoard(board);
+                GameProcessor.INSTANCE.getBackTrack().clear();
+                drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
+            }
+        });
         MenuItem loadBoard = new MenuItem("Load board");
         loadBoard.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -159,6 +189,7 @@ public enum Drawer {
         boardMenu.getItems().addAll(newRandomBoard, setBoardManually, loadBoard, saveBoard, clearBoard);
 
         Menu settings = new Menu("Settings");
+        settings.setDisable(true);
         MenuItem difSettings = new MenuItem("Difficulty settings");
         MenuItem playerSettings = new MenuItem("Player settings");
         MenuItem boardSettings = new MenuItem("Board settings");
@@ -171,6 +202,18 @@ public enum Drawer {
         Label topLabel = new Label("Board name: '" + fileName + "'.  Possible combinations: " + numberOfPossibleCombinations);
 
         VBox root = new VBox();
+        Button restartButton = new Button("<<");
+        restartButton.setMinSize(50,50);
+        restartButton.setMaxSize(50,50);
+        restartButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                GameProcessor.INSTANCE.restartBoard();
+                System.out.println(GameProcessor.INSTANCE.getBoard());
+                drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
+            }
+        });
+        restartButton.setTooltip(new Tooltip("Restart this board"));
         Button undoButton = new Button("<");
         undoButton.setMinSize(50,50);
         undoButton.setMaxSize(50,50);
@@ -202,6 +245,7 @@ public enum Drawer {
             @Override
             public void handle(ActionEvent event) {
                 SudokuBoard solvedBoard = GameProcessor.INSTANCE.solveSudokuBoard(board);
+                //SudokuBoard solvedBoard = GameProcessor.INSTANCE.simpleSolveSudokuBoard(board);
                 GameProcessor.INSTANCE.setBoard(solvedBoard);
                 System.out.println(GameProcessor.INSTANCE.getBoard());
                 drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
@@ -221,10 +265,11 @@ public enum Drawer {
         });
         clearButton.setTooltip(new Tooltip("Clear this board"));
         Button randomBoardButton = new Button("?");
+        randomBoardButton.setDisable(true);
         randomBoardButton.setMinSize(50,50);
         randomBoardButton.setMaxSize(50,50);
         randomBoardButton.setTooltip(new Tooltip("Clear and set\n new random board\n based on difficulty settings"));
-        HBox buttonsHBox = new HBox(undoButton, solveOneFieldButton, solveButton, clearButton, randomBoardButton);
+        HBox buttonsHBox = new HBox(restartButton, undoButton, solveOneFieldButton, solveButton, clearButton, randomBoardButton);
         buttonsHBox.setAlignment(Pos.CENTER);
         root.getChildren().add(menuBar);
         root.getChildren().add(topLabel);

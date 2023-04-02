@@ -41,6 +41,9 @@ public class SudokuElement {
 
     public void setFixed(boolean fixed) {
         this.fixed = fixed;
+        if (fixed) {
+            getAvailableFieldValues().clear();
+        }
     }
 
     public SudokuElement(int fieldValue, int rowIndex, int colIndex) {

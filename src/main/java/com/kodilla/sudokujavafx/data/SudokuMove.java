@@ -2,13 +2,24 @@ package com.kodilla.sudokujavafx.data;
 
 public class SudokuMove {
     private SudokuBoard board;
-    private SudokuElement element;
+    private int rowIndex;
+    private int colIndex;
     private int newValue;
+    private boolean picked = false;
 
-    public SudokuMove(SudokuBoard board, SudokuElement element, int newValue) {
+    public SudokuMove(SudokuBoard board, int rowIndex, int colIndex, int newValue) {
         this.board = board;
-        this.element = element;
+        this.rowIndex = rowIndex;
+        this.colIndex = colIndex;
         this.newValue = newValue;
+    }
+
+    public boolean isPicked() {
+        return picked;
+    }
+
+    public void setPicked(boolean picked) {
+        this.picked = picked;
     }
 
     public SudokuBoard getBoard() {
@@ -19,12 +30,20 @@ public class SudokuMove {
         this.board = board;
     }
 
-    public SudokuElement getElement() {
-        return element;
+    public int getRowIndex() {
+        return rowIndex;
     }
 
-    public void setElement(SudokuElement element) {
-        this.element = element;
+    public void setRowIndex(int rowIndex) {
+        this.rowIndex = rowIndex;
+    }
+
+    public int getColIndex() {
+        return colIndex;
+    }
+
+    public void setColIndex(int colIndex) {
+        this.colIndex = colIndex;
     }
 
     public int getNewValue() {

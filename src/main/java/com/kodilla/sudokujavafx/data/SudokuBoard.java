@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 public class SudokuBoard implements Cloneable {
     private String name;
     private int numberOfCopy;
+    private int instance;
     private List<SudokuRow> sudokuBoardList;
     private List<SubBoard> subBoardList = new ArrayList<>(Arrays.asList(
             SubBoard.TOP_LEFT, SubBoard.TOP_CENTER, SubBoard.TOP_RIGHT,
@@ -25,6 +26,15 @@ public class SudokuBoard implements Cloneable {
             sudokuBoardList.add(new SudokuRow(i));
         }
         setNumberOfCopy(0);
+        setInstance(0);
+    }
+
+    public int getInstance() {
+        return instance;
+    }
+
+    public void setInstance(int instance) {
+        this.instance = instance;
     }
 
     public SudokuBoard deepCopy() throws CloneNotSupportedException {
@@ -39,6 +49,9 @@ public class SudokuBoard implements Cloneable {
                 SudokuElement copyOfElement = new SudokuElement(element.getFieldValue(),
                         element.getRowIndex(), element.getColIndex(),
                         element.getAvailableFieldValues(), element.isFixed());
+
+                //copyOfElement.setFalseFieldValues(element.getFalseFieldValues());                  //   !!!!!!!!!
+
                 copyOfRow.getSudokuElementsList().set(element.getColIndex(), copyOfElement);
                 //copyOfRow.getSudokuElementsList().add(copyOfElement);
             }
@@ -313,5 +326,12 @@ public class SudokuBoard implements Cloneable {
         } else {
             return false;
         }
+    }
+
+    public void setAllElementsFixed() {
+        getSudokuBoardList().stream()
+                .flatMap(l -> l.getSudokuElementsList().stream())
+                .filter(e -> e.getFieldValue() != 0)
+                .forEach(sudokuElement -> sudokuElement.setFixed(true));
     }
 }
