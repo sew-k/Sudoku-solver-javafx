@@ -33,6 +33,7 @@ public enum Drawer {
             for (int c = 0; c < board.getSudokuBoardList().get(r).getSudokuElementsList().size(); c++) {
                 TextField field = drawField(stage, board.getSudokuBoardList().get(r).getSudokuElementsList().get(c));
                 if (GameProcessor.getDifficulty().equals(GameDifficulty.EASY)) {
+
                     String message = board.getElementFromBoard(r,c).getAvailableFieldValues().toString();
                     if (message.equals("[]")) {
                         message = "none available\nfield values";
@@ -64,7 +65,7 @@ public enum Drawer {
         field.textProperty().addListener(((observable, oldValue, newValue) -> {
             try {
                 if ((Validator.INSTANCE.checkFieldTextToInt(newValue)) && !newValue.equals("0")) {
-
+                    GameProcessor.INSTANCE.getBoard().calculateBoard();
                     if (GameProcessor.getDifficulty().equals(GameDifficulty.EASY)) {
                         if (!(sudokuElement.getAvailableFieldValues(GameProcessor.INSTANCE.getBoard())
                                 .contains(Integer.parseInt(newValue)))) {
@@ -92,9 +93,9 @@ public enum Drawer {
 
                     GameProcessor.INSTANCE.getBoard().calculateBoard();
 
-                    List<Integer> subBoardValuesList = GameProcessor.INSTANCE.getBoard()
-                            .getSubBoardValues(sudokuElement.getRowIndex(), sudokuElement.getColIndex());
-                    System.out.println("SubBoard values list: " + subBoardValuesList);
+//                    List<Integer> subBoardValuesList = GameProcessor.INSTANCE.getBoard()
+//                            .getSubBoardValues(sudokuElement.getRowIndex(), sudokuElement.getColIndex());
+//                    System.out.println("SubBoard values list: " + subBoardValuesList);
 
                     System.out.println(GameProcessor.INSTANCE.getBoard()
                             .getElementFromBoard(sudokuElement.getRowIndex(), sudokuElement.getColIndex())
@@ -244,7 +245,7 @@ public enum Drawer {
         solveButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                SudokuBoard solvedBoard = GameProcessor.INSTANCE.solveSudokuBoard(board);
+                SudokuBoard solvedBoard = GameProcessor.INSTANCE.solveSudokuBoard2(board);
                 //SudokuBoard solvedBoard = GameProcessor.INSTANCE.simpleSolveSudokuBoard(board);
                 GameProcessor.INSTANCE.setBoard(solvedBoard);
                 System.out.println(GameProcessor.INSTANCE.getBoard());

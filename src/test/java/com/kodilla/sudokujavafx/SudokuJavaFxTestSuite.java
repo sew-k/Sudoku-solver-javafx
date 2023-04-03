@@ -41,8 +41,6 @@ class SudokuBoardTests {
         board.setValueElementFromBoard(6,0,3);
         board.setValueElementFromBoard(7,1,0);
         board.setValueElementFromBoard(8,2,0);
-        System.out.println(board.getColValues(0));
-        System.out.println(board.getRowValues(0));
 
         //When
         List<Integer> resultList = board.getRowValues(0);
@@ -60,8 +58,6 @@ class SudokuBoardTests {
         board.setValueElementFromBoard(6,0,3);
         board.setValueElementFromBoard(7,1,0);
         board.setValueElementFromBoard(8,2,0);
-        System.out.println(board.getColValues(0));
-        System.out.println(board.getRowValues(0));
 
         //When
         List<Integer> resultList = board.getColValues(0);
@@ -130,6 +126,25 @@ class SudokuBoardTests {
 
         //Then
         Assertions.assertTrue(result);
+
+    }
+    @Test
+    void testToSimpleString() {
+        //Given
+        SudokuBoard board = new SudokuBoard();
+        board.setNumberOfCopy(2);
+        board.setName("test");
+        board.setValueElementFromBoard(4,0,1);
+        board.setValueElementFromBoard(5,0,2);
+        board.setValueElementFromBoard(6,0,3);
+        board.setValueElementFromBoard(7,1,0);
+        board.setValueElementFromBoard(8,2,0);
+
+        //When
+        String result = board.toSimpleString();
+        System.out.println(result);
+
+        //Then
 
     }
 

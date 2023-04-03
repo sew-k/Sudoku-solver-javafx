@@ -5,11 +5,9 @@ import com.kodilla.sudokujavafx.logic.Validator;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SudokuBoard implements Cloneable {
     private String name;
@@ -107,10 +105,12 @@ public class SudokuBoard implements Cloneable {
     }
 
     public SudokuElement getElementFromBoard(int row, int col) {
-        return sudokuBoardList.stream()
-                .flatMap(r -> r.getSudokuElementsList().stream())
-                .filter((e) -> e.getRowIndex() == row && e.getColIndex() == col)
-                .findAny().get();
+//        return sudokuBoardList.stream()
+//                .flatMap(r -> r.getSudokuElementsList().stream())
+//                .filter((e) -> e.getRowIndex() == row && e.getColIndex() == col)
+//                .findAny().get();
+
+        return getSudokuBoardList().get(row).getSudokuElementsList().get(col);
     }
 
     public void setValueElementFromBoard(int val, int row, int col) {
@@ -134,84 +134,123 @@ public class SudokuBoard implements Cloneable {
                 .map(v -> v.getFieldValue())
                 .collect(Collectors.toList());
     }
-    public List<Integer> getSubBoardValues(int rowIndex, int colIndex) {
-        updateSubBoards();
+    public Set<Integer> getSubBoard(int indexOfFirstElement) {
+        String boardString = toSimpleString();
+        String resultString =  Stream.of(boardString)
+                .map(s ->   s = (s.substring(indexOfFirstElement, indexOfFirstElement + 3) +
+                            s.substring(indexOfFirstElement + 9, indexOfFirstElement + 12) +
+                            s.substring(indexOfFirstElement + 18, indexOfFirstElement + 21)))
+                .collect(Collectors.joining());
+        Set<Integer> resultSet = new HashSet<>();
+        for (int i = 0; i < resultString.length(); i++) {
+            resultSet.add(Integer.parseInt(resultString.substring(i, i +1)));
+        }
+        resultSet.remove(0);
+        return resultSet;
+    }
+    public Set<Integer> getSubBoardValues(int rowIndex, int colIndex) {
+        //updateSubBoards();
         if (rowIndex < 3 && colIndex < 3) {
-            return getSubBoardList().stream()
-                    .filter(sc -> sc.getSubBoardColIndex() == 0)
-                    .filter(sr -> sr.getSubBoardRowIndex() == 0)
-                    .flatMap(s -> s.getSubBoardElementsList().stream())
-                    .map(e -> e.getFieldValue())
-                    .collect(Collectors.toList());
-        }
-        else if (rowIndex < 3 && colIndex >= 3 && colIndex < 6) {
-            return getSubBoardList().stream()
-                    .filter(sc -> sc.getSubBoardColIndex() == 1)
-                    .filter(sr -> sr.getSubBoardRowIndex() == 0)
-                    .flatMap(s -> s.getSubBoardElementsList().stream())
-                    .map(e -> e.getFieldValue())
-                    .collect(Collectors.toList());
-        }
-        else if (rowIndex < 3 && colIndex >= 6) {
-            return getSubBoardList().stream()
-                    .filter(sc -> sc.getSubBoardColIndex() == 2)
-                    .filter(sr -> sr.getSubBoardRowIndex() == 0)
-                    .flatMap(s -> s.getSubBoardElementsList().stream())
-                    .map(e -> e.getFieldValue())
-                    .collect(Collectors.toList());
-        }
-        else if (rowIndex >= 3 && rowIndex < 6 && colIndex < 3) {
-            return getSubBoardList().stream()
-                    .filter(sc -> sc.getSubBoardColIndex() == 0)
-                    .filter(sr -> sr.getSubBoardRowIndex() == 1)
-                    .flatMap(s -> s.getSubBoardElementsList().stream())
-                    .map(e -> e.getFieldValue())
-                    .collect(Collectors.toList());
-        }
-        else if (rowIndex >= 3 && rowIndex < 6 && colIndex >= 3 && colIndex < 6) {
-            return getSubBoardList().stream()
-                    .filter(sc -> sc.getSubBoardColIndex() == 1)
-                    .filter(sr -> sr.getSubBoardRowIndex() == 1)
-                    .flatMap(s -> s.getSubBoardElementsList().stream())
-                    .map(e -> e.getFieldValue())
-                    .collect(Collectors.toList());
-        }
-        else if (rowIndex >= 3 && rowIndex < 6 && colIndex >= 6) {
-            return getSubBoardList().stream()
-                    .filter(sc -> sc.getSubBoardColIndex() == 2)
-                    .filter(sr -> sr.getSubBoardRowIndex() == 1)
-                    .flatMap(s -> s.getSubBoardElementsList().stream())
-                    .map(e -> e.getFieldValue())
-                    .collect(Collectors.toList());
-        }
-        else if (rowIndex >= 6 && colIndex < 3) {
-            return getSubBoardList().stream()
-                    .filter(sc -> sc.getSubBoardColIndex() == 0)
-                    .filter(sr -> sr.getSubBoardRowIndex() == 2)
-                    .flatMap(s -> s.getSubBoardElementsList().stream())
-                    .map(e -> e.getFieldValue())
-                    .collect(Collectors.toList());
-        }
-        else if (rowIndex >= 6 && colIndex >= 3 && colIndex < 6) {
-            return getSubBoardList().stream()
-                    .filter(sc -> sc.getSubBoardColIndex() == 1)
-                    .filter(sr -> sr.getSubBoardRowIndex() == 2)
-                    .flatMap(s -> s.getSubBoardElementsList().stream())
-                    .map(e -> e.getFieldValue())
-                    .collect(Collectors.toList());
-        }
-        else if (rowIndex >= 6 && colIndex >= 6) {
-            return getSubBoardList().stream()
-                    .filter(sc -> sc.getSubBoardColIndex() == 2)
-                    .filter(sr -> sr.getSubBoardRowIndex() == 2)
-                    .flatMap(s -> s.getSubBoardElementsList().stream())
-                    .map(e -> e.getFieldValue())
-                    .collect(Collectors.toList());
-        }
-        else {
+            return getSubBoard(0);
+        } else if (rowIndex < 3 && colIndex >= 3 && colIndex < 6) {
+            return getSubBoard(3);
+        } else if (rowIndex < 3 && colIndex >= 6) {
+            return getSubBoard(6);
+        } else if (rowIndex >= 3 && rowIndex < 6 && colIndex < 3) {
+            return getSubBoard(27);
+        } else if (rowIndex >= 3 && rowIndex < 6 && colIndex >= 3 && colIndex < 6) {
+            return getSubBoard(30);
+        } else if (rowIndex >= 3 && rowIndex < 6 && colIndex >= 6) {
+            return getSubBoard(33);
+        } else if (rowIndex >= 6 && colIndex < 3) {
+            return getSubBoard(54);
+        } else if (rowIndex >= 6 && colIndex >= 3 && colIndex < 6) {
+            return getSubBoard(57);
+        } else if (rowIndex >= 6 && colIndex >= 6) {
+            return getSubBoard(60);
+        } else {
             return null;
+
         }
     }
+//    public List<Integer> getSubBoardValues(int rowIndex, int colIndex) {
+//        updateSubBoards();
+//        if (rowIndex < 3 && colIndex < 3) {
+//            return getSubBoardList().stream()
+//                    .filter(sc -> sc.getSubBoardColIndex() == 0)
+//                    .filter(sr -> sr.getSubBoardRowIndex() == 0)
+//                    .flatMap(s -> s.getSubBoardElementsList().stream())
+//                    .map(e -> e.getFieldValue())
+//                    .collect(Collectors.toList());
+//        }
+//        else if (rowIndex < 3 && colIndex >= 3 && colIndex < 6) {
+//            return getSubBoardList().stream()
+//                    .filter(sc -> sc.getSubBoardColIndex() == 1)
+//                    .filter(sr -> sr.getSubBoardRowIndex() == 0)
+//                    .flatMap(s -> s.getSubBoardElementsList().stream())
+//                    .map(e -> e.getFieldValue())
+//                    .collect(Collectors.toList());
+//        }
+//        else if (rowIndex < 3 && colIndex >= 6) {
+//            return getSubBoardList().stream()
+//                    .filter(sc -> sc.getSubBoardColIndex() == 2)
+//                    .filter(sr -> sr.getSubBoardRowIndex() == 0)
+//                    .flatMap(s -> s.getSubBoardElementsList().stream())
+//                    .map(e -> e.getFieldValue())
+//                    .collect(Collectors.toList());
+//        }
+//        else if (rowIndex >= 3 && rowIndex < 6 && colIndex < 3) {
+//            return getSubBoardList().stream()
+//                    .filter(sc -> sc.getSubBoardColIndex() == 0)
+//                    .filter(sr -> sr.getSubBoardRowIndex() == 1)
+//                    .flatMap(s -> s.getSubBoardElementsList().stream())
+//                    .map(e -> e.getFieldValue())
+//                    .collect(Collectors.toList());
+//        }
+//        else if (rowIndex >= 3 && rowIndex < 6 && colIndex >= 3 && colIndex < 6) {
+//            return getSubBoardList().stream()
+//                    .filter(sc -> sc.getSubBoardColIndex() == 1)
+//                    .filter(sr -> sr.getSubBoardRowIndex() == 1)
+//                    .flatMap(s -> s.getSubBoardElementsList().stream())
+//                    .map(e -> e.getFieldValue())
+//                    .collect(Collectors.toList());
+//        }
+//        else if (rowIndex >= 3 && rowIndex < 6 && colIndex >= 6) {
+//            return getSubBoardList().stream()
+//                    .filter(sc -> sc.getSubBoardColIndex() == 2)
+//                    .filter(sr -> sr.getSubBoardRowIndex() == 1)
+//                    .flatMap(s -> s.getSubBoardElementsList().stream())
+//                    .map(e -> e.getFieldValue())
+//                    .collect(Collectors.toList());
+//        }
+//        else if (rowIndex >= 6 && colIndex < 3) {
+//            return getSubBoardList().stream()
+//                    .filter(sc -> sc.getSubBoardColIndex() == 0)
+//                    .filter(sr -> sr.getSubBoardRowIndex() == 2)
+//                    .flatMap(s -> s.getSubBoardElementsList().stream())
+//                    .map(e -> e.getFieldValue())
+//                    .collect(Collectors.toList());
+//        }
+//        else if (rowIndex >= 6 && colIndex >= 3 && colIndex < 6) {
+//            return getSubBoardList().stream()
+//                    .filter(sc -> sc.getSubBoardColIndex() == 1)
+//                    .filter(sr -> sr.getSubBoardRowIndex() == 2)
+//                    .flatMap(s -> s.getSubBoardElementsList().stream())
+//                    .map(e -> e.getFieldValue())
+//                    .collect(Collectors.toList());
+//        }
+//        else if (rowIndex >= 6 && colIndex >= 6) {
+//            return getSubBoardList().stream()
+//                    .filter(sc -> sc.getSubBoardColIndex() == 2)
+//                    .filter(sr -> sr.getSubBoardRowIndex() == 2)
+//                    .flatMap(s -> s.getSubBoardElementsList().stream())
+//                    .map(e -> e.getFieldValue())
+//                    .collect(Collectors.toList());
+//        }
+//        else {
+//            return null;
+//        }
+//    }
     public void calculateBoard() {
         getSudokuBoardList().stream()
                 .flatMap(l -> l.getSudokuElementsList().stream())
@@ -226,6 +265,16 @@ public class SudokuBoard implements Cloneable {
             boardString = boardString + row.toString() + "\n";
         }
         return boardString;
+    }
+
+    public String toSimpleString() {
+        String boardString = "";
+
+        return getSudokuBoardList().stream()
+                .flatMap(l -> l.getSudokuElementsList().stream())
+                .map(e -> e.getFieldValue())
+                .map(i -> Integer.toString(i))
+                .collect(Collectors.joining());
     }
 
     public List<SudokuRow> getSudokuBoardList() {

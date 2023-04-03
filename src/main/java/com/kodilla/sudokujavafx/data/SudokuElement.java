@@ -97,16 +97,18 @@ public class SudokuElement {
     }
     public void calculateAvailableFieldValues(SudokuBoard board) {
         Set<Integer> resultValues = new HashSet<>(Set.of(0,1,2,3,4,5,6,7,8,9));
-        //Set<Integer> resultValues = getAvailableFieldValues();
+
         Set<Integer> actualRowSet = board.getRowValues(getRowIndex()).stream().collect(Collectors.toSet());
         resultValues.removeAll(actualRowSet);
         Set<Integer> actualColSet = board.getColValues(getColIndex()).stream().collect(Collectors.toSet());
         resultValues.removeAll(actualColSet);
         board.updateSubBoards();
-        Set<Integer> actualSubBoardSet = board.getSubBoardValues(rowIndex, colIndex).stream()
-                        .collect(Collectors.toSet());
+//        Set<Integer> actualSubBoardSet = board.getSubBoardValues(rowIndex, colIndex).stream()
+//                        .collect(Collectors.toSet());
+        Set<Integer> actualSubBoardSet = board.getSubBoardValues(rowIndex, colIndex);
         resultValues.removeAll(actualSubBoardSet);
-        resultValues.removeAll(falseFieldValues);
+        //resultValues.removeAll(falseFieldValues);
+
         setAvailableFieldValues(resultValues);
     }
     public Set getAvailableFieldValues(SudokuBoard board) {

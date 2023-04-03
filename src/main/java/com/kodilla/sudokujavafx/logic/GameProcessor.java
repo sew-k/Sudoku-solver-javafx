@@ -7,6 +7,7 @@ import com.kodilla.sudokujavafx.data.SudokuRow;
 import com.kodilla.sudokujavafx.presentation.Drawer;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -18,8 +19,10 @@ public enum GameProcessor {
     //private List<SudokuBoard> backTrackList = new ArrayList<>();
     private Deque<SudokuMove> backTrack = new ArrayDeque<>();
     private Deque<SudokuBoard> backTrackOfBoards = new ArrayDeque<>();
+    private Deque<String> backTrackOfBoardsStringList = new ArrayDeque<>();
     private List<SudokuBoard> solvedBoardsList = new ArrayList<>();
     private List<SudokuBoard> falseBoardsList = new ArrayList<>();
+    private List<String> falseBoardsStringList = new ArrayList<>();
 
     private GameProcessor() {
     }
@@ -88,6 +91,9 @@ public enum GameProcessor {
     public void setBoard(SudokuBoard board) {
         this.board = board;
         getSolvedBoardsList().clear();
+        getFalseBoardsList().clear();
+        getBackTrackOfBoards().clear();
+        getBackTrack().clear();
         System.out.println("Board '" + getBoard().getName() + " /#" + getBoard().getNumberOfCopy() + "' set as current");
     }
 
@@ -100,7 +106,7 @@ public enum GameProcessor {
     }
 
     public void solveRandomSudokuElement(SudokuBoard board) {
-        //board.calculateBoard();
+
         SudokuBoard boardCopyToBacktrack = getCopyOfBoard(board);
         List<SudokuElement> unsolvedSudokuElementList = board.getUnsolvedSudokuElements();
         Random random = new Random();
@@ -141,50 +147,6 @@ public enum GameProcessor {
         }
     }
 
-    public void solveRandomSudokuElementForCPU(SudokuBoard board) {
-        //board.calculateBoard();
-        //SudokuBoard boardCopyToBacktrack = getCopyOfBoard(board);
-        List<SudokuElement> unsolvedSudokuElementList = board.getUnsolvedSudokuElements();
-        Random random = new Random();
-        SudokuElement solvedElement;
-
-
-        SudokuElement elementOneAvailableValue = unsolvedSudokuElementList.stream()
-                .filter(e -> e.getAvailableFieldValues().size() == 1)
-                .findFirst().orElse(null);
-
-        if (elementOneAvailableValue != null) {
-            solvedElement = elementOneAvailableValue;
-        }
-
-//        if ((solvedElement != null) && (solvedElement.getAvailableFieldValues().size() > 0))  {
-//            List<Integer> availableFieldValuesList = solvedElement.getAvailableFieldValues().stream()
-//                    .collect(Collectors.toList());
-//            solvedElement.setFieldValue(availableFieldValuesList
-//                    .get(random.nextInt(0, availableFieldValuesList.size())));
-//            board.setValueElementFromBoard(solvedElement.getFieldValue(), solvedElement.getRowIndex(), solvedElement.getColIndex());
-
-//
-//
-//            addMoveToBackTrack();
-//
-//
-//            System.out.println("Element: " + solvedElement + " - available set - " + solvedElement.getAvailableFieldValues());
-//
-//        } else {
-//            System.out.println("Unable to solve!");    //TODO - handle this situation
-//        }
-    }
-    public void setNextCopyOfBoardAsCurrent() {
-        try {
-            SudokuBoard copyOfBoard = getBoard().deepCopy();
-
-            setBoard(copyOfBoard);
-            System.out.println("Current board is: " + copyOfBoard.getName() + " [copy #" + copyOfBoard.getNumberOfCopy() + "]");
-        } catch (CloneNotSupportedException e) {
-            System.out.println("Exception when trying to clone current board: " + e);
-        }
-    }
     public SudokuBoard getCopyOfBoard(SudokuBoard board) {
         try {
             SudokuBoard copyOfBoard = board.deepCopy();
@@ -214,7 +176,23 @@ public enum GameProcessor {
         this.backTrack = backTrack;
     }
 
-//    public SudokuBoard solveSudokuBoard(SudokuBoard board) {
+    public Deque<String> getBackTrackOfBoardsStringList() {
+        return backTrackOfBoardsStringList;
+    }
+
+    public void setBackTrackOfBoardsStringList(Deque<String> backTrackOfBoardsStringList) {
+        this.backTrackOfBoardsStringList = backTrackOfBoardsStringList;
+    }
+
+    public List<String> getFalseBoardsStringList() {
+        return falseBoardsStringList;
+    }
+
+    public void setFalseBoardsStringList(List<String> falseBoardsStringList) {
+        this.falseBoardsStringList = falseBoardsStringList;
+    }
+
+    //    public SudokuBoard solveSudokuBoard(SudokuBoard board) {
 //        while (!board.isBoardSolved()) {
 //            solveRandomSudokuElement(board);
 //            if (board.getNumberOfSolutions() == 0) {
@@ -259,33 +237,101 @@ public enum GameProcessor {
             return element;
         }
     }
-//    public SudokuBoard solveSudokuBoard(SudokuBoard board) {
-//
-//        if (board.isBoardSolved()) {
-//            getSolvedBoardsList().add(board);
-//            System.out.println();
-//            System.out.println(" !!! board saved to solved list ");
-//            System.out.println(" !!! solved boards list has: " + getSolvedBoardsList().size() + " elements");
-//            System.out.println();
-//            return board;
-//
-//        } else {
-//            if (board.getNumberOfSolutions() == 1) {
-//                solveRandomSudokuElement(board);
-//                solveSudokuBoard(board);
-//            } else if (board.getNumberOfSolutions() > 1) {
-//                solveRandomSudokuElement(board);
-//                solveSudokuBoard(board);
-//
-//            } else if (board.getNumberOfSolutions() == 0) {
-//                board = getBackTrackOfBoards().pollLast();
-//                while (getBackTrackOfBoards().peekLast().getNumberOfSolutions() == 1)
+    public SudokuBoard solveSudokuBoard2(SudokuBoard board) {
+        //board.calculateBoard();
+        if (board.isBoardSolved()) {
+            getSolvedBoardsList().add(board);
+            System.out.println();
+            System.out.println(" !!! board saved to solved list ");
+            System.out.println(" !!! solved boards list has: " + getSolvedBoardsList().size() + " elements");
+            System.out.println();
+            return board;
+
+        } else {
+            if (board.getNumberOfSolutions() == 1) {
+                System.out.println("number of solutions : " + board.getNumberOfSolutions());
+
+                SudokuElement element = board.getSudokuBoardList().stream()
+                        .flatMap(l -> l.getSudokuElementsList().stream())
+                        .filter(e -> e.getAvailableFieldValues().size() == 1 && e.getFieldValue() == 0)
+                        .findFirst().orElse(null);
+                SudokuElement solvedElement = solveElement(element);
+                board.setValueElementFromBoard(solvedElement.getFieldValue(), solvedElement.getRowIndex(), solvedElement.getColIndex());
+                board.calculateBoard();
+                System.out.println(element);
+                System.out.println(solvedElement);
+                //return board;
+                //board = solveSudokuBoard(board);
+
+            } else if (board.getNumberOfSolutions() > 1) {
+                System.out.println("number of solutions : " + board.getNumberOfSolutions());
+                int copyNumber = 0;
+                for (SudokuElement element : board.getUnsolvedSudokuElements()) {
+                    for (int availableValue : element.getAvailableFieldValues()) {
+                        SudokuBoard copyOfBoard = getCopyOfBoard(board);
+                        copyOfBoard.setInstance(copyOfBoard.getUnsolvedSudokuElements().size());
+                        copyOfBoard.setValueElementFromBoard(availableValue, element.getRowIndex(), element.getColIndex());
+
+                        if (!getFalseBoardsList().contains(copyOfBoard.toSimpleString())) {
+                            //addBoardToBackTrack(copyOfBoard);
+                            copyNumber = copyNumber + 1;
+                            copyOfBoard.setNumberOfCopy(copyNumber);
+                            getBackTrackOfBoardsStringList().offer(copyOfBoard.toSimpleString());
+                        } else {
+                            System.out.println();
+                            System.out.println("REJECTED!!!");
+                            System.out.println(copyOfBoard);
+                            System.out.println();
+                        }
+
+                    }
+
+                }
+                if (copyNumber == 0) {
+                    getBackTrackOfBoardsStringList().pollLast();
+                    try {
+                        getFalseBoardsList().add(board);
+                        board = board.setBoardFromString(getBackTrackOfBoardsStringList().peekLast());
+                        System.out.println("taken board [copy #" + board.getNumberOfCopy() + ", instance #" + board.getInstance() + "] now backtrack has " + getBackTrackOfBoardsStringList().size() + "records");
+                    } catch (IOException e) {
+
+                    }
+                } else {
+                    try {
+                        board = board.setBoardFromString(getBackTrackOfBoardsStringList().peekLast());
+                        System.out.println("taken board [copy #" + board.getNumberOfCopy() + ", instance #" + board.getInstance() + "] now backtrack has " + getBackTrackOfBoardsStringList().size() + "records");
+                    } catch (IOException e) {
+
+                    }
+                }
+//                board.calculateBoard();
+                //board = solveSudokuBoard(board);
+
+            } else if (board.getNumberOfSolutions() == 0) {
+                System.out.println("number of solutions : " + board.getNumberOfSolutions());
+                try {
+                    board = board.setBoardFromString(getBackTrackOfBoardsStringList().pollLast());
+                    System.out.println("taken board [copy #" + board.getNumberOfCopy() + ", instance #" + board.getInstance() + "] now backtrack has " + getBackTrackOfBoardsStringList().size() + "records");
+                } catch (IOException e) {
+
+                }
+                if (getFalseBoardsStringList().add(board.toSimpleString())) {
+                    System.out.println("board: \n" + board + "\nadded to falseList");
+                }
+                try {
+                    board = board.setBoardFromString(getBackTrackOfBoardsStringList().pollLast());
+                    System.out.println("taken board [copy #" + board.getNumberOfCopy() + ", instance #" + board.getInstance() + "] now backtrack has " + getBackTrackOfBoardsStringList().size() + "records");
+                } catch (IOException e) {
+
+                }
+                System.out.println("taken board [copy #" + board.getNumberOfCopy() + ", instance #" + board.getInstance() + "] now backtrack has " + getBackTrackOfBoardsStringList().size() + "records");
 //                board.calculateBoard();
 //                board = solveSudokuBoard(board);
-//            }
-//        }
-//        return board;
-//    }
+            }
+            board = solveSudokuBoard(board);
+        }
+        return board;
+    }
     public SudokuBoard solveSudokuBoard(SudokuBoard board) {
         board.calculateBoard();
         if (board.isBoardSolved()) {
