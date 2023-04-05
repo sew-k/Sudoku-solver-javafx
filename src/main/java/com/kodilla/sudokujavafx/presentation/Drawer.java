@@ -93,10 +93,6 @@ public enum Drawer {
 
                     GameProcessor.INSTANCE.getBoard().calculateBoard();
 
-//                    List<Integer> subBoardValuesList = GameProcessor.INSTANCE.getBoard()
-//                            .getSubBoardValues(sudokuElement.getRowIndex(), sudokuElement.getColIndex());
-//                    System.out.println("SubBoard values list: " + subBoardValuesList);
-
                     System.out.println(GameProcessor.INSTANCE.getBoard()
                             .getElementFromBoard(sudokuElement.getRowIndex(), sudokuElement.getColIndex())
                             .getAvailableFieldValues(GameProcessor.INSTANCE.getBoard()));
@@ -245,7 +241,8 @@ public enum Drawer {
         solveButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                SudokuBoard solvedBoard = GameProcessor.INSTANCE.solveSudokuBoard2(board);
+                SudokuBoard solvedBoard = GameProcessor.INSTANCE.solveBoard(board);
+                //SudokuBoard solvedBoard = GameProcessor.INSTANCE.solveSudokuBoard2(board);
                 //SudokuBoard solvedBoard = GameProcessor.INSTANCE.simpleSolveSudokuBoard(board);
                 GameProcessor.INSTANCE.setBoard(solvedBoard);
                 System.out.println(GameProcessor.INSTANCE.getBoard());

@@ -76,8 +76,7 @@ public class SudokuElement {
 
     @Override
     public String toString() {
-
-        return "[" + getRowIndex() + ";" + getColIndex() + "]:" + Integer.toString(fieldValue);
+        return "[" + getRowIndex() + ";" + getColIndex() + "]:" + fieldValue;
     }
 
     public int getFieldValue() {
@@ -102,12 +101,9 @@ public class SudokuElement {
         resultValues.removeAll(actualRowSet);
         Set<Integer> actualColSet = board.getColValues(getColIndex()).stream().collect(Collectors.toSet());
         resultValues.removeAll(actualColSet);
-        board.updateSubBoards();
-//        Set<Integer> actualSubBoardSet = board.getSubBoardValues(rowIndex, colIndex).stream()
-//                        .collect(Collectors.toSet());
-        Set<Integer> actualSubBoardSet = board.getSubBoardValues(rowIndex, colIndex);
+        Set<Integer> actualSubBoardSet = board.getSubBoardValues(getRowIndex(), getColIndex());
         resultValues.removeAll(actualSubBoardSet);
-        //resultValues.removeAll(falseFieldValues);
+        resultValues.removeAll(getFalseFieldValues());
 
         setAvailableFieldValues(resultValues);
     }
@@ -142,5 +138,10 @@ public class SudokuElement {
         } else {
             return true;
         }
+    }
+
+    public int getFirstElementSolution() {
+        return getAvailableFieldValues().stream()
+                .findFirst().orElse(null);
     }
 }

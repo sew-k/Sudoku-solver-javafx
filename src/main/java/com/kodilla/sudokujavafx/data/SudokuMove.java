@@ -1,5 +1,7 @@
 package com.kodilla.sudokujavafx.data;
 
+import java.util.Objects;
+
 public class SudokuMove {
     private SudokuBoard board;
     private int rowIndex;
@@ -52,5 +54,18 @@ public class SudokuMove {
 
     public void setNewValue(int newValue) {
         this.newValue = newValue;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SudokuMove move = (SudokuMove) o;
+        return rowIndex == move.rowIndex && colIndex == move.colIndex && newValue == move.newValue && Objects.equals(board, move.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(board, rowIndex, colIndex, newValue);
     }
 }

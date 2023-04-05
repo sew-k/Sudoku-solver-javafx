@@ -14,10 +14,6 @@ public class SudokuBoard implements Cloneable {
     private int numberOfCopy;
     private int instance;
     private List<SudokuRow> sudokuBoardList;
-    private List<SubBoard> subBoardList = new ArrayList<>(Arrays.asList(
-            SubBoard.TOP_LEFT, SubBoard.TOP_CENTER, SubBoard.TOP_RIGHT,
-            SubBoard.CENTER_LEFT, SubBoard.CENTER, SubBoard.CENTER_RIGHT,
-            SubBoard.BOTTOM_LEFT, SubBoard.BOTTOM_CENTER, SubBoard.BOTTOM_RIGHT));
 
     public SudokuBoard() {
         sudokuBoardList = new ArrayList<>();
@@ -42,17 +38,17 @@ public class SudokuBoard implements Cloneable {
         copyOfBoard.setName(this.getName());
         copyOfBoard.sudokuBoardList = new ArrayList<>();
         for (SudokuRow row : getSudokuBoardList()) {
-            //List<SudokuElement> copyOfSudokuElementList = new ArrayList<>();
+
             SudokuRow copyOfRow = new SudokuRow(row.getRowNumber());
             for (SudokuElement element : row.getSudokuElementsList()) {
                 SudokuElement copyOfElement = new SudokuElement(element.getFieldValue(),
                         element.getRowIndex(), element.getColIndex(),
                         element.getAvailableFieldValues(), element.isFixed());
 
-                //copyOfElement.setFalseFieldValues(element.getFalseFieldValues());                  //   !!!!!!!!!
+                copyOfElement.getFalseFieldValues().addAll(element.getFalseFieldValues());                  //   !!!!!!!!!
 
                 copyOfRow.getSudokuElementsList().set(element.getColIndex(), copyOfElement);
-                //copyOfRow.getSudokuElementsList().add(copyOfElement);
+
             }
             copyOfBoard.getSudokuBoardList().add(copyOfRow);
         }
@@ -88,28 +84,8 @@ public class SudokuBoard implements Cloneable {
         this.numberOfCopy = numberOfCopy;
     }
 
-    public void setSubBoardList(List<SubBoard> subBoardList) {
-        this.subBoardList = subBoardList;
-    }
-
-    public void updateSubBoards() {
-        SubBoard.TOP_LEFT.addElementsToSubBoardElementsList(SubBoard.TOP_LEFT, this);
-        SubBoard.TOP_CENTER.addElementsToSubBoardElementsList(SubBoard.TOP_CENTER, this);
-        SubBoard.TOP_RIGHT.addElementsToSubBoardElementsList(SubBoard.TOP_RIGHT, this);
-        SubBoard.CENTER_LEFT.addElementsToSubBoardElementsList(SubBoard.CENTER_LEFT, this);
-        SubBoard.CENTER.addElementsToSubBoardElementsList(SubBoard.CENTER, this);
-        SubBoard.CENTER_RIGHT.addElementsToSubBoardElementsList(SubBoard.CENTER_RIGHT, this);
-        SubBoard.BOTTOM_LEFT.addElementsToSubBoardElementsList(SubBoard.BOTTOM_LEFT, this);
-        SubBoard.BOTTOM_CENTER.addElementsToSubBoardElementsList(SubBoard.BOTTOM_CENTER, this);
-        SubBoard.BOTTOM_RIGHT.addElementsToSubBoardElementsList(SubBoard.BOTTOM_RIGHT, this);
-    }
 
     public SudokuElement getElementFromBoard(int row, int col) {
-//        return sudokuBoardList.stream()
-//                .flatMap(r -> r.getSudokuElementsList().stream())
-//                .filter((e) -> e.getRowIndex() == row && e.getColIndex() == col)
-//                .findAny().get();
-
         return getSudokuBoardList().get(row).getSudokuElementsList().get(col);
     }
 
@@ -149,7 +125,7 @@ public class SudokuBoard implements Cloneable {
         return resultSet;
     }
     public Set<Integer> getSubBoardValues(int rowIndex, int colIndex) {
-        //updateSubBoards();
+        //calculateBoard();
         if (rowIndex < 3 && colIndex < 3) {
             return getSubBoard(0);
         } else if (rowIndex < 3 && colIndex >= 3 && colIndex < 6) {
@@ -173,84 +149,7 @@ public class SudokuBoard implements Cloneable {
 
         }
     }
-//    public List<Integer> getSubBoardValues(int rowIndex, int colIndex) {
-//        updateSubBoards();
-//        if (rowIndex < 3 && colIndex < 3) {
-//            return getSubBoardList().stream()
-//                    .filter(sc -> sc.getSubBoardColIndex() == 0)
-//                    .filter(sr -> sr.getSubBoardRowIndex() == 0)
-//                    .flatMap(s -> s.getSubBoardElementsList().stream())
-//                    .map(e -> e.getFieldValue())
-//                    .collect(Collectors.toList());
-//        }
-//        else if (rowIndex < 3 && colIndex >= 3 && colIndex < 6) {
-//            return getSubBoardList().stream()
-//                    .filter(sc -> sc.getSubBoardColIndex() == 1)
-//                    .filter(sr -> sr.getSubBoardRowIndex() == 0)
-//                    .flatMap(s -> s.getSubBoardElementsList().stream())
-//                    .map(e -> e.getFieldValue())
-//                    .collect(Collectors.toList());
-//        }
-//        else if (rowIndex < 3 && colIndex >= 6) {
-//            return getSubBoardList().stream()
-//                    .filter(sc -> sc.getSubBoardColIndex() == 2)
-//                    .filter(sr -> sr.getSubBoardRowIndex() == 0)
-//                    .flatMap(s -> s.getSubBoardElementsList().stream())
-//                    .map(e -> e.getFieldValue())
-//                    .collect(Collectors.toList());
-//        }
-//        else if (rowIndex >= 3 && rowIndex < 6 && colIndex < 3) {
-//            return getSubBoardList().stream()
-//                    .filter(sc -> sc.getSubBoardColIndex() == 0)
-//                    .filter(sr -> sr.getSubBoardRowIndex() == 1)
-//                    .flatMap(s -> s.getSubBoardElementsList().stream())
-//                    .map(e -> e.getFieldValue())
-//                    .collect(Collectors.toList());
-//        }
-//        else if (rowIndex >= 3 && rowIndex < 6 && colIndex >= 3 && colIndex < 6) {
-//            return getSubBoardList().stream()
-//                    .filter(sc -> sc.getSubBoardColIndex() == 1)
-//                    .filter(sr -> sr.getSubBoardRowIndex() == 1)
-//                    .flatMap(s -> s.getSubBoardElementsList().stream())
-//                    .map(e -> e.getFieldValue())
-//                    .collect(Collectors.toList());
-//        }
-//        else if (rowIndex >= 3 && rowIndex < 6 && colIndex >= 6) {
-//            return getSubBoardList().stream()
-//                    .filter(sc -> sc.getSubBoardColIndex() == 2)
-//                    .filter(sr -> sr.getSubBoardRowIndex() == 1)
-//                    .flatMap(s -> s.getSubBoardElementsList().stream())
-//                    .map(e -> e.getFieldValue())
-//                    .collect(Collectors.toList());
-//        }
-//        else if (rowIndex >= 6 && colIndex < 3) {
-//            return getSubBoardList().stream()
-//                    .filter(sc -> sc.getSubBoardColIndex() == 0)
-//                    .filter(sr -> sr.getSubBoardRowIndex() == 2)
-//                    .flatMap(s -> s.getSubBoardElementsList().stream())
-//                    .map(e -> e.getFieldValue())
-//                    .collect(Collectors.toList());
-//        }
-//        else if (rowIndex >= 6 && colIndex >= 3 && colIndex < 6) {
-//            return getSubBoardList().stream()
-//                    .filter(sc -> sc.getSubBoardColIndex() == 1)
-//                    .filter(sr -> sr.getSubBoardRowIndex() == 2)
-//                    .flatMap(s -> s.getSubBoardElementsList().stream())
-//                    .map(e -> e.getFieldValue())
-//                    .collect(Collectors.toList());
-//        }
-//        else if (rowIndex >= 6 && colIndex >= 6) {
-//            return getSubBoardList().stream()
-//                    .filter(sc -> sc.getSubBoardColIndex() == 2)
-//                    .filter(sr -> sr.getSubBoardRowIndex() == 2)
-//                    .flatMap(s -> s.getSubBoardElementsList().stream())
-//                    .map(e -> e.getFieldValue())
-//                    .collect(Collectors.toList());
-//        }
-//        else {
-//            return null;
-//        }
-//    }
+
     public void calculateBoard() {
         getSudokuBoardList().stream()
                 .flatMap(l -> l.getSudokuElementsList().stream())
@@ -348,10 +247,6 @@ public class SudokuBoard implements Cloneable {
         return board;
     }
 
-    public List<SubBoard> getSubBoardList() {
-        return subBoardList;
-    }
-
     public List<SudokuElement> getUnsolvedSudokuElements() {
         return getSudokuBoardList().stream()
                 .flatMap(l -> l.getSudokuElementsList().stream())
@@ -360,21 +255,16 @@ public class SudokuBoard implements Cloneable {
     }
 
     public int getNumberOfSolutions() {
-        calculateBoard();
-        List<Integer> numberAvailableFieldValuesForElements = getSudokuBoardList().stream()
+        //calculateBoard();
+        return getSudokuBoardList().stream()
                 .flatMap(b -> b.getSudokuElementsList().stream())
                 .filter(x -> !x.isFixed())
                 .filter(y ->  y.getFieldValue() == 0)
                 .map(e -> e.getAvailableFieldValues().size())
-                .collect(Collectors.toList());
-
-        return numberAvailableFieldValuesForElements.stream()
-                .mapToInt(v -> v)
-                .min().orElse(-1);         //TODO if -1 means sudoku solved, if 0 - sudoku unable to solve
+                .min(Integer::compareTo).orElse(-1);          //TODO if -1 means sudoku solved, if 0 - sudoku unable to solve
     }
 
     public boolean isBoardCorrect() {
-
         return getSudokuBoardList().stream()
                 .flatMap(r -> r.getSudokuElementsList().stream())
                 .filter(v -> v.getFieldValue() != 0)
@@ -382,14 +272,6 @@ public class SudokuBoard implements Cloneable {
                 .filter(c -> c == false)
                 .findAny().orElse(true);
     }
-
-//    public boolean isBoardCorrect() {
-//        return getSudokuBoardList().stream()
-//                .flatMap(r -> r.getSudokuElementsList().stream())
-//                .filter(v -> v.getFieldValue() != 0)
-//                .map(e -> e.isElementValueCorrect())
-//                .noneMatch(p -> p == false);
-//    }
 
     public boolean isBoardSolved() {
         List<SudokuElement> unsolvedElements = getUnsolvedSudokuElements();
@@ -405,5 +287,27 @@ public class SudokuBoard implements Cloneable {
                 .flatMap(l -> l.getSudokuElementsList().stream())
                 .filter(e -> e.getFieldValue() != 0)
                 .forEach(sudokuElement -> sudokuElement.setFixed(true));
+    }
+
+    public SudokuElement getElementWithOneSolution() {
+        calculateBoard();
+        return getSudokuBoardList().stream()
+                .flatMap(l -> l.getSudokuElementsList().stream())
+                .filter(e -> e.getFieldValue() == 0)
+                .filter(o -> o.getAvailableFieldValues().size() == 1)
+                .findFirst().orElse(null);
+    }
+
+    public SudokuElement getElementWithMultipleSolutions() {
+        calculateBoard();
+        return getSudokuBoardList().stream()
+                .flatMap(l -> l.getSudokuElementsList().stream())
+                .filter(e -> e.getFieldValue() == 0)
+                .filter(o -> o.getAvailableFieldValues().size() > 1)
+                .findFirst().orElse(null);
+    }
+
+    public void updateBoardWithElement(SudokuElement element) {
+        setValueElementFromBoard(element.getFieldValue(), element.getRowIndex(), element.getColIndex());
     }
 }
