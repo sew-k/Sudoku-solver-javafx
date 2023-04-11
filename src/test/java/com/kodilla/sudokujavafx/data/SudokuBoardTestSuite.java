@@ -40,8 +40,9 @@ public class SudokuBoardTestSuite {
 
         //When
         board.getElementFromBoard(0,0).calculateAvailableFieldValues(board);
-        System.out.println(board.getElementFromBoard(0,0).getAvailableFieldValues());
-        board.setValueElementFromBoard(3,0,0, false);
+        board.getElementFromBoard(0,0).setFieldValue(3);
+//        System.out.println(board.getElementFromBoard(0,0).getAvailableFieldValues());
+//        board.setValueElementFromBoard(3,0,0, false);
 
         //Then
         Assertions.assertTrue(board.isBoardSolved());
@@ -69,8 +70,9 @@ public class SudokuBoardTestSuite {
 
         }
         board.getElementFromBoard(0,0).calculateAvailableFieldValues(board);
-        System.out.println(board.getElementFromBoard(0,0).getAvailableFieldValues());
-        board.setValueElementFromBoard(9,0,0, false);
+        board.getElementFromBoard(0,0).setFieldValue(9);
+//        System.out.println(board.getElementFromBoard(0,0).getAvailableFieldValues());
+//        board.setValueElementFromBoard(9,0,0, false);
 
 
         //When & Then

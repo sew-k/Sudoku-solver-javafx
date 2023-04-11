@@ -19,11 +19,11 @@ class SudokuBoardTests {
     void testGetAvailableFieldValues() {
         //Given
         SudokuBoard board = new SudokuBoard();
-        board.setValueElementFromBoard(4,0,1);
-        board.setValueElementFromBoard(5,0,2);
-        board.setValueElementFromBoard(6,0,3);
-        board.setValueElementFromBoard(7,1,0);
-        board.setValueElementFromBoard(8,2,0);
+        board.getElementFromBoard(0,1).setFieldValue(4);
+        board.getElementFromBoard(0,2).setFieldValue(5);
+        board.getElementFromBoard(0,3).setFieldValue(6);
+        board.getElementFromBoard(1,0).setFieldValue(7);
+        board.getElementFromBoard(2,0).setFieldValue(8);
 
         //When
         Set<Integer> resultSet = board.getElementFromBoard(0,0).getAvailableFieldValues(board);
@@ -36,11 +36,11 @@ class SudokuBoardTests {
     void testGetRowValues() {
         //Given
         SudokuBoard board = new SudokuBoard();
-        board.setValueElementFromBoard(4,0,1);
-        board.setValueElementFromBoard(5,0,2);
-        board.setValueElementFromBoard(6,0,3);
-        board.setValueElementFromBoard(7,1,0);
-        board.setValueElementFromBoard(8,2,0);
+        board.getElementFromBoard(0,1).setFieldValue(4);
+        board.getElementFromBoard(0,2).setFieldValue(5);
+        board.getElementFromBoard(0,3).setFieldValue(6);
+        board.getElementFromBoard(1,0).setFieldValue(7);
+        board.getElementFromBoard(2,0).setFieldValue(8);
 
         //When
         List<Integer> resultList = board.getRowValues(0);
@@ -53,11 +53,11 @@ class SudokuBoardTests {
     void testGetColValues() {
         //Given
         SudokuBoard board = new SudokuBoard();
-        board.setValueElementFromBoard(4,0,1);
-        board.setValueElementFromBoard(5,0,2);
-        board.setValueElementFromBoard(6,0,3);
-        board.setValueElementFromBoard(7,1,0);
-        board.setValueElementFromBoard(8,2,0);
+        board.getElementFromBoard(0,1).setFieldValue(4);
+        board.getElementFromBoard(0,2).setFieldValue(5);
+        board.getElementFromBoard(0,3).setFieldValue(6);
+        board.getElementFromBoard(1,0).setFieldValue(7);
+        board.getElementFromBoard(2,0).setFieldValue(8);
 
         //When
         List<Integer> resultList = board.getColValues(0);
@@ -70,13 +70,12 @@ class SudokuBoardTests {
     void testDeepCopy() {
         //Given
         SudokuBoard board = new SudokuBoard();
-        board.setNumberOfCopy(2);
         board.setName("test");
-        board.setValueElementFromBoard(4,0,1);
-        board.setValueElementFromBoard(5,0,2);
-        board.setValueElementFromBoard(6,0,3);
-        board.setValueElementFromBoard(7,1,0);
-        board.setValueElementFromBoard(8,2,0);
+        board.getElementFromBoard(0,1).setFieldValue(4);
+        board.getElementFromBoard(0,2).setFieldValue(5);
+        board.getElementFromBoard(0,3).setFieldValue(6);
+        board.getElementFromBoard(1,0).setFieldValue(7);
+        board.getElementFromBoard(2,0).setFieldValue(8);
 
         //When
         SudokuBoard deepCopyOfBoard = new SudokuBoard();
@@ -87,7 +86,6 @@ class SudokuBoardTests {
 
         //Then
         Assertions.assertEquals(board.getName(), deepCopyOfBoard.getName());
-        Assertions.assertEquals(board.getNumberOfCopy() + 1, deepCopyOfBoard.getNumberOfCopy());
         Assertions.assertEquals(board.getSudokuBoardList(), deepCopyOfBoard.getSudokuBoardList());
     }
 
@@ -96,9 +94,9 @@ class SudokuBoardTests {
         //Given
         SudokuBoard board = new SudokuBoard();
         board.calculateBoard();
-        board.setValueElementFromBoard(1,0,0);
+        board.getElementFromBoard(0,0).setFieldValue(1);
         board.calculateBoard();
-        board.setValueElementFromBoard(1,0,1);
+        board.getElementFromBoard(0,1).setFieldValue(1);
 
         //When
 
@@ -112,9 +110,9 @@ class SudokuBoardTests {
         //Given
         SudokuBoard board = new SudokuBoard();
         board.calculateBoard();
-        board.setValueElementFromBoard(1,0,0);
+        board.getElementFromBoard(0,0).setFieldValue(1);
         board.calculateBoard();
-        board.setValueElementFromBoard(2,0,1);
+        board.getElementFromBoard(0,1).setFieldValue(2);
         System.out.println(board);
 //        System.out.println("0,1: " + board.getElementFromBoard(0,1).isElementValueCorrect());
 //        System.out.println("0,1: " + board.getElementFromBoard(0,1).getAvailableFieldValues());
@@ -132,13 +130,12 @@ class SudokuBoardTests {
     void testToSimpleString() {
         //Given
         SudokuBoard board = new SudokuBoard();
-        board.setNumberOfCopy(2);
         board.setName("test");
-        board.setValueElementFromBoard(4,0,1);
-        board.setValueElementFromBoard(5,0,2);
-        board.setValueElementFromBoard(6,0,3);
-        board.setValueElementFromBoard(7,1,0);
-        board.setValueElementFromBoard(8,2,0);
+        board.getElementFromBoard(0,1).setFieldValue(4);
+        board.getElementFromBoard(0,2).setFieldValue(5);
+        board.getElementFromBoard(0,3).setFieldValue(6);
+        board.getElementFromBoard(1,0).setFieldValue(7);
+        board.getElementFromBoard(2,0).setFieldValue(8);
 
         //When
         String result = board.toSimpleString();
