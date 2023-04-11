@@ -7,6 +7,7 @@ import com.kodilla.sudokujavafx.logic.GameDifficulty;
 import com.kodilla.sudokujavafx.logic.GameProcessor;
 import com.kodilla.sudokujavafx.logic.Validator;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -81,21 +82,26 @@ public enum Drawer {
 
                     }
                     sudokuElement.setFieldValue(Integer.parseInt(newValue));
-                    System.out.println("textfield at row index " +
-                            sudokuElement.getRowIndex() + "/ column index " +
-                            sudokuElement.getColIndex() + "; changed from " +
-                            oldValue + " to " + newValue + " : " + sudokuElement.getFieldValue());
-                    System.out.println(GameProcessor.INSTANCE.getBoard());
+//                    System.out.println("textfield at row index " +
+//                            sudokuElement.getRowIndex() + "/ column index " +
+//                            sudokuElement.getColIndex() + "; changed from " +
+//                            oldValue + " to " + newValue + " : " + sudokuElement.getFieldValue());
+//                    System.out.println(GameProcessor.INSTANCE.getBoard());
 
                     if (copyBoardToBackTrack != null) {
-                        GameProcessor.INSTANCE.addMoveToBackTrack(new SudokuMove(copyBoardToBackTrack, sudokuElement.getRowIndex(), sudokuElement.getColIndex(), sudokuElement.getFieldValue()));
+//                        GameProcessor.INSTANCE.addMoveToBackTrack(new SudokuMove(copyBoardToBackTrack, sudokuElement.getRowIndex(), sudokuElement.getColIndex(), sudokuElement.getFieldValue()));
+                        GameProcessor.INSTANCE.getBackTrack()
+                                .add(new SudokuMove(copyBoardToBackTrack,
+                                        sudokuElement.getRowIndex(),
+                                        sudokuElement.getColIndex(),
+                                        sudokuElement.getFieldValue()));
                     }
 
                     GameProcessor.INSTANCE.getBoard().calculateBoard();
 
-                    System.out.println(GameProcessor.INSTANCE.getBoard()
-                            .getElementFromBoard(sudokuElement.getRowIndex(), sudokuElement.getColIndex())
-                            .getAvailableFieldValues(GameProcessor.INSTANCE.getBoard()));
+//                    System.out.println(GameProcessor.INSTANCE.getBoard()
+//                            .getElementFromBoard(sudokuElement.getRowIndex(), sudokuElement.getColIndex())
+//                            .getAvailableFieldValues(GameProcessor.INSTANCE.getBoard()));
 
                 } else {
                     field.setText("");
@@ -137,7 +143,7 @@ public enum Drawer {
         setBoardManually.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                board.setAllElementsFixed();
+                board.setBoardManually();
                 GameProcessor.INSTANCE.setBoard(board);
                 GameProcessor.INSTANCE.getBackTrack().clear();
                 drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
@@ -155,6 +161,7 @@ public enum Drawer {
                     GameProcessor.INSTANCE.getBackTrack().clear();
                     GameProcessor.INSTANCE.setBoard(newBoard);
                     drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
+                    GameProcessor.INSTANCE.setOriginalBoard(GameProcessor.INSTANCE.getCopyOfBoard(newBoard));
                 }
             }
         });
@@ -186,17 +193,69 @@ public enum Drawer {
         boardMenu.getItems().addAll(newRandomBoard, setBoardManually, loadBoard, saveBoard, clearBoard);
 
         Menu settings = new Menu("Settings");
-        settings.setDisable(true);
-        MenuItem difSettings = new MenuItem("Difficulty settings");
-        MenuItem playerSettings = new MenuItem("Player settings");
+        //settings.setDisable(true);
+        Menu difSettings = new Menu("Difficulty settings");
+        RadioMenuItem easy = new RadioMenuItem("easy");
+        RadioMenuItem medium = new RadioMenuItem("medium");
+        RadioMenuItem hard = new RadioMenuItem("hard");
+        hard.setDisable(true);
+        difSettings.getItems().addAll(easy,medium,hard);
+        difSettings.setOnShowing(new EventHandler<Event>() {
+            @Override
+            public void handle(Event event) {
+                switch (GameProcessor.getDifficulty()) {
+                    case EASY -> {
+                        easy.setSelected(true);
+                        medium.setSelected(false);
+                        hard.setSelected(false);
+                    }
+                    case MEDIUM -> {
+                        easy.setSelected(false);
+                        medium.setSelected(true);
+                        hard.setSelected(false);
+                    }
+                    case HARD -> {
+                        easy.setSelected(false);
+                        medium.setSelected(false);
+                        hard.setSelected(true);
+                    }
+        }
+            }
+        });
+        easy.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                GameProcessor.setDifficulty(GameDifficulty.EASY);
+                System.out.println("Difficulty setting changed to: " + GameProcessor.getDifficulty());
+            }
+        });
+        medium.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                GameProcessor.setDifficulty(GameDifficulty.MEDIUM);
+                System.out.println("Difficulty setting changed to: " + GameProcessor.getDifficulty());
+            }
+        });
+        hard.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                GameProcessor.setDifficulty(GameDifficulty.HARD);
+                System.out.println("Difficulty setting changed to: " + GameProcessor.getDifficulty());
+            }
+        });
+
         MenuItem boardSettings = new MenuItem("Board settings");
-        settings.getItems().addAll(difSettings, playerSettings, boardSettings);
+        boardSettings.setDisable(true);
+        settings.getItems().addAll(difSettings, boardSettings);
 
         menuBar.getMenus().addAll(game, boardMenu, settings);
 
         String fileName = GameProcessor.INSTANCE.getBoard().getName();
-        int numberOfPossibleCombinations = board.getNumberOfSolutions();
-        Label topLabel = new Label("Board name: '" + fileName + "'.  Minimum possible moves: " + numberOfPossibleCombinations);
+
+        String message = Integer.toString(board.getNumberOfSolutions());
+        if (message.equals("-1")) message = " solved! ";
+
+        Label topLabel = new Label("Board name: '" + fileName + "'.  Minimum possible moves: " + message);
 
         VBox root = new VBox();
         Button restartButton = new Button("<<");
@@ -242,11 +301,17 @@ public enum Drawer {
             @Override
             public void handle(ActionEvent event) {
                 SudokuBoard solvedBoard = GameProcessor.INSTANCE.solveBoard(board);
-                //SudokuBoard solvedBoard = GameProcessor.INSTANCE.solveSudokuBoard2(board);
-                //SudokuBoard solvedBoard = GameProcessor.INSTANCE.simpleSolveSudokuBoard(board);
-                GameProcessor.INSTANCE.setBoard(solvedBoard);
-                System.out.println(GameProcessor.INSTANCE.getBoard());
-                drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
+                if (solvedBoard != null) {
+                    GameProcessor.INSTANCE.setBoard(solvedBoard);
+                    System.out.println(GameProcessor.INSTANCE.getBoard());
+                    drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
+                } else {
+                    Alert a = new Alert(Alert.AlertType.INFORMATION);
+                    a.setHeaderText("Sudoku board is invalid\nUnable to solve!");
+                    a.setTitle("Sudoku game");
+                    a.setHeight(100);
+                    a.show();
+                }
             }
         });
         solveButton.setTooltip(new Tooltip("Solve this board by CPU"));

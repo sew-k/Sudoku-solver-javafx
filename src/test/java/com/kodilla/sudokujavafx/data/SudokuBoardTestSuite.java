@@ -18,14 +18,15 @@ public class SudokuBoardTestSuite {
         }
 
         //When
-//        Set<Integer> expectedSet = Set.of(2, 8, 3);
-//        Set<Integer> resultSet = board.getSubBoard(0);
+        Set<Integer> expectedSet1 = Set.of(2, 8, 3);
+        Set<Integer> resultSet1 = board.getSubBoard(0);
 
-        Set<Integer> expectedSet = Set.of(7, 8, 6);
-        Set<Integer> resultSet = board.getSubBoard(60);
+        Set<Integer> expectedSet2 = Set.of(7, 8, 6);
+        Set<Integer> resultSet2 = board.getSubBoard(60);
 
         //Then
-        Assertions.assertEquals(expectedSet, resultSet);
+        Assertions.assertEquals(expectedSet1, resultSet1);
+        Assertions.assertEquals(expectedSet2, resultSet2);
     }
     @Test
     void testIsBoardSolvedIfSolved() {
@@ -102,13 +103,15 @@ public class SudokuBoardTestSuite {
 
         }
         //When
-        SudokuElement elementToUpdateBoard = new SudokuElement(2,0,2);
-        board.updateBoardWithElement(elementToUpdateBoard);
-        SudokuElement expectedElement = elementToUpdateBoard;
+//        SudokuElement elementToUpdateBoard = new SudokuElement(2,0,2);
+//        board.updateBoardWithElement(elementToUpdateBoard);
+//        SudokuElement expectedElement = elementToUpdateBoard;
+        board.getElementFromBoard(0,2).setFieldValue(2);
         SudokuElement resultElement = board.getElementFromBoard(0,2);
 
         //Then
-        Assertions.assertEquals(expectedElement, resultElement);
+        //Assertions.assertEquals(expectedElement, resultElement);
+        Assertions.assertEquals(2, resultElement.getFieldValue());
     }
     @Test
     void testGetElementWithMultipleSolutions() {
