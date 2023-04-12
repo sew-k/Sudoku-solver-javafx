@@ -67,6 +67,7 @@ public enum Drawer {
             try {
                 if ((Validator.INSTANCE.checkFieldTextToInt(newValue)) && !newValue.equals("0")) {
                     GameProcessor.INSTANCE.getBoard().calculateBoard();
+                    sudokuElement.calculateAvailableFieldValues(GameProcessor.INSTANCE.getBoard());
                     if (GameProcessor.getDifficulty().equals(GameDifficulty.EASY)) {
                         if (!(sudokuElement.getAvailableFieldValues(GameProcessor.INSTANCE.getBoard())
                                 .contains(Integer.parseInt(newValue)))) {
@@ -76,20 +77,15 @@ public enum Drawer {
                         }
                     }
                     SudokuBoard copyBoardToBackTrack = null;
-                    try {
-                        copyBoardToBackTrack = GameProcessor.INSTANCE.getBoard().deepCopy();
-                    } catch (CloneNotSupportedException e) {
-
-                    }
+//                    try {
+//                        copyBoardToBackTrack = GameProcessor.INSTANCE.getBoard().deepCopy();
+//                    } catch (CloneNotSupportedException e) {
+//
+//                    }
+                    copyBoardToBackTrack = GameProcessor.INSTANCE.getCopyOfBoard(GameProcessor.INSTANCE.getBoard());
                     sudokuElement.setFieldValue(Integer.parseInt(newValue));
-//                    System.out.println("textfield at row index " +
-//                            sudokuElement.getRowIndex() + "/ column index " +
-//                            sudokuElement.getColIndex() + "; changed from " +
-//                            oldValue + " to " + newValue + " : " + sudokuElement.getFieldValue());
-//                    System.out.println(GameProcessor.INSTANCE.getBoard());
 
                     if (copyBoardToBackTrack != null) {
-//                        GameProcessor.INSTANCE.addMoveToBackTrack(new SudokuMove(copyBoardToBackTrack, sudokuElement.getRowIndex(), sudokuElement.getColIndex(), sudokuElement.getFieldValue()));
                         GameProcessor.INSTANCE.getBackTrack()
                                 .add(new SudokuMove(copyBoardToBackTrack,
                                         sudokuElement.getRowIndex(),
@@ -99,13 +95,8 @@ public enum Drawer {
 
                     GameProcessor.INSTANCE.getBoard().calculateBoard();
 
-//                    System.out.println(GameProcessor.INSTANCE.getBoard()
-//                            .getElementFromBoard(sudokuElement.getRowIndex(), sudokuElement.getColIndex())
-//                            .getAvailableFieldValues(GameProcessor.INSTANCE.getBoard()));
-
                 } else {
                     field.setText("");
-                    //field.setText(oldValue);
                 }
             } catch (NumberFormatException e) {
                 System.out.println("exception: " + e);
@@ -160,8 +151,8 @@ public enum Drawer {
                     SudokuBoard newBoard = board.loadBoard(file);
                     GameProcessor.INSTANCE.getBackTrack().clear();
                     GameProcessor.INSTANCE.setBoard(newBoard);
-                    drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
                     GameProcessor.INSTANCE.setOriginalBoard(GameProcessor.INSTANCE.getCopyOfBoard(newBoard));
+                    drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
                 }
             }
         });

@@ -9,8 +9,8 @@ public class SudokuElement {
     private Set<Integer> availableFieldValues;
     private Set<Integer> falseFieldValues = new HashSet<>();
 
-    private int rowIndex;
-    private int colIndex;
+    private final int rowIndex;
+    private final int colIndex;
     private boolean fixed;
 
     @Override
@@ -46,14 +46,14 @@ public class SudokuElement {
         }
     }
 
-    public SudokuElement(int fieldValue, int rowIndex, int colIndex) {
+    public SudokuElement(int fieldValue, final int rowIndex, final int colIndex) {
         this.fieldValue = fieldValue;
         availableFieldValues = new HashSet<>(Set.of(0,1,2,3,4,5,6,7,8,9));
         falseFieldValues = new HashSet<>();
         this.rowIndex = rowIndex;
         this.colIndex = colIndex;
     }
-    public SudokuElement(int fieldValue, int rowIndex, int colIndex, Set<Integer> availableFieldValues, boolean fixed) {
+    public SudokuElement(int fieldValue, final int rowIndex, final int colIndex, Set<Integer> availableFieldValues, boolean fixed) {
         this.fieldValue = fieldValue;
         this.rowIndex = rowIndex;
         this.colIndex = colIndex;
@@ -63,15 +63,6 @@ public class SudokuElement {
 
     public Set<Integer> getFalseFieldValues() {
         return falseFieldValues;
-    }
-
-    public void setFalseFieldValues(Set<Integer> falseFieldValues) {
-        this.falseFieldValues = falseFieldValues;
-    }
-    public void addValueToFalseFieldValues(int value) {
-        if (getFalseFieldValues().add(value)) {
-            System.out.println("- added value " + value + " to falseFieldValues in Element: " + this);
-        }
     }
 
     @Override
@@ -116,16 +107,8 @@ public class SudokuElement {
         return rowIndex;
     }
 
-    public void setRowIndex(int rowIndex) {
-        this.rowIndex = rowIndex;
-    }
-
     public int getColIndex() {
         return colIndex;
-    }
-
-    public void setColIndex(int colIndex) {
-        this.colIndex = colIndex;
     }
 
     public boolean isElementValueCorrect() {

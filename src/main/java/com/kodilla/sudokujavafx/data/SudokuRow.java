@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class SudokuRow {
     private List<SudokuElement> sudokuElementsList;
-    private int rowNumber;
+    private final int rowNumber;
 
     @Override
     public boolean equals(Object o) {
@@ -26,14 +26,10 @@ public class SudokuRow {
         return result;
     }
 
-    public SudokuRow(int rowNumber) {
+    public SudokuRow(final int rowNumber) {
+        this.rowNumber = rowNumber;
         sudokuElementsList = new ArrayList<>();
         for (int i = 0; i < 9; i++) {
-
-//            //TEMPORARILY                   //TODO
-//            Random random = new Random();
-//            int fieldValue = random.nextInt(0,10);
-
             sudokuElementsList.add(new SudokuElement(0, rowNumber, i));
         }
     }
@@ -51,15 +47,8 @@ public class SudokuRow {
         return sudokuElementsList;
     }
 
-    public void setSudokuElementsList(List<SudokuElement> sudokuElementsList) {
-        this.sudokuElementsList = sudokuElementsList;
-    }
-
     public int getRowNumber() {
         return rowNumber;
     }
 
-    public void setRowNumber(int rowNumber) {
-        this.rowNumber = rowNumber;
-    }
 }

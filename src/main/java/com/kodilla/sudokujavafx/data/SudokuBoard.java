@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 
 public class SudokuBoard implements Cloneable {
     private String name;
-//    private int numberOfCopy;
+
     private List<SudokuRow> sudokuBoardList;
 
     public SudokuBoard() {
@@ -19,26 +19,20 @@ public class SudokuBoard implements Cloneable {
         for (int i = 0; i < 9; i++) {
             sudokuBoardList.add(new SudokuRow(i));
         }
-//        setNumberOfCopy(0);
     }
 
     public SudokuBoard deepCopy() throws CloneNotSupportedException {
         SudokuBoard copyOfBoard = (SudokuBoard) this.clone();
-//        copyOfBoard.setNumberOfCopy(this.getNumberOfCopy() + 1);
         copyOfBoard.setName(this.getName());
         copyOfBoard.sudokuBoardList = new ArrayList<>();
         for (SudokuRow row : getSudokuBoardList()) {
-
             SudokuRow copyOfRow = new SudokuRow(row.getRowNumber());
             for (SudokuElement element : row.getSudokuElementsList()) {
                 SudokuElement copyOfElement = new SudokuElement(element.getFieldValue(),
                         element.getRowIndex(), element.getColIndex(),
                         element.getAvailableFieldValues(), element.isFixed());
-
                 copyOfElement.getFalseFieldValues().addAll(element.getFalseFieldValues());
-
                 copyOfRow.getSudokuElementsList().set(element.getColIndex(), copyOfElement);
-
             }
             copyOfBoard.getSudokuBoardList().add(copyOfRow);
         }
@@ -66,25 +60,9 @@ public class SudokuBoard implements Cloneable {
         this.name = name;
     }
 
-//    public int getNumberOfCopy() {
-//        return numberOfCopy;
-//    }
-
-//    public void setNumberOfCopy(int numberOfCopy) {
-//        this.numberOfCopy = numberOfCopy;
-//    }
-
     public SudokuElement getElementFromBoard(int row, int col) {
         return getSudokuBoardList().get(row).getSudokuElementsList().get(col);
     }
-
-//    public void setValueElementFromBoard(int val, int row, int col) {
-//        getElementFromBoard(row, col).setFieldValue(val);
-//    }
-//    public void setValueElementFromBoard(int val, int row, int col, boolean fixed) {
-//        getElementFromBoard(row, col).setFieldValue(val);
-//        getElementFromBoard(row, col).setFixed(fixed);
-//    }
 
     public List<Integer> getRowValues(int rowIndex) {
         return getSudokuBoardList().get(rowIndex)
@@ -154,8 +132,6 @@ public class SudokuBoard implements Cloneable {
     }
 
     public String toSimpleString() {
-        String boardString = "";
-
         return getSudokuBoardList().stream()
                 .flatMap(l -> l.getSudokuElementsList().stream())
                 .map(e -> e.getFieldValue())
@@ -187,11 +163,8 @@ public class SudokuBoard implements Cloneable {
                     int elementValue = Integer.parseInt(Character.toString(text.charAt(i)));
                     boolean fixed = true;
                     if (elementValue == 0) fixed = false;
-                    //newBoard.setValueElementFromBoard(elementValue, row, col, fixed);
                     newBoard.getElementFromBoard(row,col).setFieldValue(elementValue);
                     newBoard.getElementFromBoard(row,col).setFixed(fixed);
-                    //System.out.println("elementValue: " + elementValue);
-                    //System.out.println("i: " + i);
                     i++;
                 } else {
                     throw new IOException("*** invalid element value at [" + i + "] ***");
@@ -204,7 +177,6 @@ public class SudokuBoard implements Cloneable {
     public SudokuBoard loadBoard(File file) {
         System.out.println(file);
         try {
-//            System.out.println("Loading the board");
             String textFromFile = Files.readString(file.toPath());
             String newString = "";
             for (char c : textFromFile.toCharArray()) {
@@ -212,14 +184,8 @@ public class SudokuBoard implements Cloneable {
                     newString = newString + c;
                 }
             }
-//            System.out.println(newString);
             SudokuBoard newBoard = setBoardFromString(newString);
             newBoard.setName(file.getName());
-//            newBoard.setNumberOfCopy(0);
-//            System.out.println("board");
-//            System.out.println(newBoard);
-//            GameProcessor.INSTANCE.setBoard(newBoard);
-//            System.out.println("Successful loaded board: \n" + GameProcessor.INSTANCE.getBoard());
             return newBoard;
         } catch (IOException e) {
             System.out.println("Exception:" + e);
