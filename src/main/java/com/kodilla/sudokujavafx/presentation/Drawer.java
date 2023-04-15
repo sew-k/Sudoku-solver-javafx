@@ -24,6 +24,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 
 public enum Drawer {
@@ -89,7 +90,7 @@ public enum Drawer {
                     }
 
                     GameProcessor.INSTANCE.getBoard().calculateBoard();
-
+                    drawMainWindow(stage,GameProcessor.INSTANCE.getBoard());
                 } else {
                     field.setText("");
                 }
@@ -143,6 +144,8 @@ public enum Drawer {
             public void handle(ActionEvent event) {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle("Load board");
+                String path = Paths.get("./src/main/resources/").toAbsolutePath().toString();
+                fileChooser.setInitialDirectory(new File(path));
                 File file = fileChooser.showOpenDialog(stage);
                 if (file != null) {
                     SudokuBoard newBoard = board.loadBoard(file);
@@ -159,6 +162,8 @@ public enum Drawer {
             public void handle(ActionEvent event) {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle("Save board");
+                String path = Paths.get("./src/main/resources/").toAbsolutePath().toString();
+                fileChooser.setInitialDirectory(new File(path));
                 File file = fileChooser.showSaveDialog(stage);
                 if (file != null) {
                     try {
@@ -239,7 +244,7 @@ public enum Drawer {
         String fileName = GameProcessor.INSTANCE.getBoard().getName();
 
         String message = Integer.toString(board.getNumberOfSolutions());
-        if (message.equals("-1")) message = " solved! ";
+        if (GameProcessor.INSTANCE.getBoard().isBoardSolved()) message = " solved! ";
 
         Label topLabel = new Label("Board name: '" + fileName + "'.  Minimum possible moves: " + message);
         VBox root = new VBox();
