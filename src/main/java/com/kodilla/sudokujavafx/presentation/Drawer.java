@@ -36,14 +36,6 @@ public enum Drawer {
         for (int r = 0; r < board.getSudokuBoardList().size(); r++) {
             for (int c = 0; c < board.getSudokuBoardList().get(r).getSudokuElementsList().size(); c++) {
                 TextField field = drawField(stage, board.getSudokuBoardList().get(r).getSudokuElementsList().get(c));
-//                if (GameProcessor.getDifficulty().equals(GameDifficulty.EASY)) {
-//                    String message = board.getElementFromBoard(r,c).getAvailableFieldValues().toString();
-//                    if (message.equals("[]")) {
-//                        message = "none available\nfield values";
-//                    }
-//                    Tooltip tooltip = new Tooltip(message);
-//                    field.setTooltip(tooltip);
-//                }
                 gridPane.add(field, c, r);
             }
         }
@@ -61,8 +53,11 @@ public enum Drawer {
         if (sudokuElement.isFixed()) {
             field.setStyle("-fx-text-fill: BLACK; -fx-border-color: gray; -fx-font-size: 18; -fx-font-weight: bold");
             field.setEditable(false);
-        } else {
+        } else if (!sudokuElement.isFixed() && sudokuElement.isElementValueCorrect()) {
             field.setStyle("-fx-text-fill: BLUE; -fx-border-color: gray; -fx-font-size: 18");
+            field.setEditable(true);
+        } else if (!sudokuElement.isFixed() && !sudokuElement.isElementValueCorrect()) {
+            field.setStyle("-fx-text-fill: RED; -fx-border-color: gray; -fx-font-size: 18");
             field.setEditable(true);
         }
         field.textProperty().addListener(((observable, oldValue, newValue) -> {
@@ -138,6 +133,7 @@ public enum Drawer {
                 board.setBoardManually();
                 GameProcessor.INSTANCE.setBoard(board);
                 GameProcessor.INSTANCE.getBackTrack().clear();
+                GameProcessor.INSTANCE.setOriginalBoard(GameProcessor.INSTANCE.getCopyOfBoard(board));
                 drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
             }
         });
@@ -296,11 +292,7 @@ public enum Drawer {
                     System.out.println(GameProcessor.INSTANCE.getBoard());
                     drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
                 } else {
-                    Alert a = new Alert(Alert.AlertType.INFORMATION);
-                    a.setHeaderText("Sudoku board is invalid\nUnable to solve!");
-                    a.setTitle("Sudoku game");
-                    a.setHeight(100);
-                    a.show();
+                    alertCantSolveBoard();
                 }
             }
         });
@@ -332,6 +324,14 @@ public enum Drawer {
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();
+    }
+
+    public void alertCantSolveBoard() {
+        Alert a = new Alert(Alert.AlertType.INFORMATION);
+        a.setHeaderText("Sudoku board is invalid\nUnable to solve!");
+        a.setTitle("Sudoku game");
+        a.setHeight(100);
+        a.show();
     }
 
 }

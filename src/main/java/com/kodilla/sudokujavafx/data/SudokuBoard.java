@@ -154,7 +154,8 @@ public class SudokuBoard implements Cloneable {
     public void setBoardManually() {
         setAllElementsFixed();
     }
-    public SudokuBoard setBoardFromString(String text) throws IOException {
+
+    public SudokuBoard setBoardFromString(String text) throws NumberFormatException {
         SudokuBoard newBoard = new SudokuBoard();
         int i = 0;
         for (int row = 0; row < 9; row++) {
@@ -167,7 +168,7 @@ public class SudokuBoard implements Cloneable {
                     newBoard.getElementFromBoard(row,col).setFixed(fixed);
                     i++;
                 } else {
-                    throw new IOException("*** invalid element value at [" + i + "] ***");
+                    throw new NumberFormatException("*** invalid element value at [" + i + "] ***");
                 }
             }
         }
@@ -198,7 +199,6 @@ public class SudokuBoard implements Cloneable {
     }
     public SudokuBoard clearBoard() {
         SudokuBoard board = new SudokuBoard();
-        System.out.println(board);
         return board;
     }
 

@@ -36,18 +36,11 @@ public enum GameProcessor {
     }
 
     public void setOriginalBoard(SudokuBoard originalBoard) {
-
         this.originalBoard = getCopyOfBoard(originalBoard);
     }
 
     public void addMoveToBackTrack(SudokuMove move) {
-        if (getBackTrack().add(move)) {
-            System.out.println("Added board " +
-                    move.getBoard().getName() +
-                    " and move on element [" + move.getRowIndex() + "|" + move.getColIndex() + "], with new value: " + move.getNewValue() + " to backTrack");
-            System.out.println("There are [" + getBackTrack().size() + "] elements in backtrack");
-        }
-        //getBackTrack().add(move);
+        getBackTrack().add(move);
     }
 
     public void exitGame(Stage stage) {
@@ -125,7 +118,6 @@ public enum GameProcessor {
     }
 
     public void setPreviousBoard() {
-        System.out.println("backtrack has " + getBackTrack().size() + " elements");
         if (getBackTrack().size() > 0) {
             SudokuBoard previousBoard = getBackTrack().pollLast().getBoard();
             setBoard(previousBoard);
