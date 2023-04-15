@@ -9,9 +9,12 @@ import com.kodilla.sudokujavafx.logic.Validator;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -33,15 +36,14 @@ public enum Drawer {
         for (int r = 0; r < board.getSudokuBoardList().size(); r++) {
             for (int c = 0; c < board.getSudokuBoardList().get(r).getSudokuElementsList().size(); c++) {
                 TextField field = drawField(stage, board.getSudokuBoardList().get(r).getSudokuElementsList().get(c));
-                if (GameProcessor.getDifficulty().equals(GameDifficulty.EASY)) {
-
-                    String message = board.getElementFromBoard(r,c).getAvailableFieldValues().toString();
-                    if (message.equals("[]")) {
-                        message = "none available\nfield values";
-                    }
-                    Tooltip tooltip = new Tooltip(message);
-                    field.setTooltip(tooltip);
-                }
+//                if (GameProcessor.getDifficulty().equals(GameDifficulty.EASY)) {
+//                    String message = board.getElementFromBoard(r,c).getAvailableFieldValues().toString();
+//                    if (message.equals("[]")) {
+//                        message = "none available\nfield values";
+//                    }
+//                    Tooltip tooltip = new Tooltip(message);
+//                    field.setTooltip(tooltip);
+//                }
                 gridPane.add(field, c, r);
             }
         }
@@ -67,7 +69,6 @@ public enum Drawer {
             try {
                 if ((Validator.INSTANCE.checkFieldTextToInt(newValue)) && !newValue.equals("0")) {
                     GameProcessor.INSTANCE.getBoard().calculateBoard();
-                    sudokuElement.calculateAvailableFieldValues(GameProcessor.INSTANCE.getBoard());
                     if (GameProcessor.getDifficulty().equals(GameDifficulty.EASY)) {
                         if (!(sudokuElement.getAvailableFieldValues(GameProcessor.INSTANCE.getBoard())
                                 .contains(Integer.parseInt(newValue)))) {
@@ -75,13 +76,12 @@ public enum Drawer {
                         } else {
                             field.setStyle("-fx-text-fill: BLUE; -fx-border-color: gray; -fx-font-size: 18");
                         }
+                    } else if (GameProcessor.getDifficulty().equals(GameDifficulty.MEDIUM)) {
+                        field.setStyle("-fx-text-fill: grey; -fx-border-color: gray; -fx-font-size: 18");
                     }
-                    SudokuBoard copyBoardToBackTrack = null;
-//                    try {
-//                        copyBoardToBackTrack = GameProcessor.INSTANCE.getBoard().deepCopy();
-//                    } catch (CloneNotSupportedException e) {
-//
-//                    }
+
+                    SudokuBoard copyBoardToBackTrack;
+
                     copyBoardToBackTrack = GameProcessor.INSTANCE.getCopyOfBoard(GameProcessor.INSTANCE.getBoard());
                     sudokuElement.setFieldValue(Integer.parseInt(newValue));
 
@@ -105,6 +105,7 @@ public enum Drawer {
             }
         }
         ));
+        field.setFocusTraversable(false);
         return field;
     }
 
@@ -182,9 +183,7 @@ public enum Drawer {
             }
         });
         boardMenu.getItems().addAll(newRandomBoard, setBoardManually, loadBoard, saveBoard, clearBoard);
-
         Menu settings = new Menu("Settings");
-        //settings.setDisable(true);
         Menu difSettings = new Menu("Difficulty settings");
         RadioMenuItem easy = new RadioMenuItem("easy");
         RadioMenuItem medium = new RadioMenuItem("medium");
@@ -247,8 +246,8 @@ public enum Drawer {
         if (message.equals("-1")) message = " solved! ";
 
         Label topLabel = new Label("Board name: '" + fileName + "'.  Minimum possible moves: " + message);
-
         VBox root = new VBox();
+
         Button restartButton = new Button("<<");
         restartButton.setMinSize(50,50);
         restartButton.setMaxSize(50,50);
