@@ -10,7 +10,8 @@ The next step is to implement clean code best practices and a few Creational Des
 
 ### Application features
 
-- Automatically solving any uploaded Sudoku board
+- Solve Sudoku board with game difficulty set on: easy/ medium/ hard
+- Automatically (CPU) solving any uploaded Sudoku board
 - Checking if given Sudoku board is valid
 - Managing the loading, saving, and custom setup of Sudoku boards
 
@@ -22,11 +23,15 @@ The next step is to implement clean code best practices and a few Creational Des
 
 ## Getting started
 
+- To test this Game, download it (clone GitHub repository), build, compile and run in favourite Java IDE
 
 ### Requirements
 
+- Java JDK 17 installed
+- IDE with Gradle build tool
 
 ### How to use
+
 
 
 ## Troubleshooting
