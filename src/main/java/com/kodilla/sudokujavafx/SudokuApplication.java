@@ -8,13 +8,11 @@ public class SudokuApplication extends Application {
 
     @Override
     public void start(Stage stage) {
-
         GameProcessor gameProcessor = GameProcessor.INSTANCE;
         gameProcessor.processGame(stage);
     }
 
     public static void main(String[] args) {
-
         launch();
     }
 }
