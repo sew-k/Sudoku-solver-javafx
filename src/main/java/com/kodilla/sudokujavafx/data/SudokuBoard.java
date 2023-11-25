@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 
 public class SudokuBoard implements Cloneable {
     private String name;
-
     private List<SudokuRow> sudokuBoardList;
 
     public SudokuBoard() {
@@ -70,6 +69,7 @@ public class SudokuBoard implements Cloneable {
                 .map(e -> e.getFieldValue())
                 .collect(Collectors.toList());
     }
+
     public List<Integer> getColValues(int colIndex) {
         return getSudokuBoardList().stream()
                 .flatMap(r -> r.getSudokuElementsList().stream())
@@ -77,6 +77,7 @@ public class SudokuBoard implements Cloneable {
                 .map(v -> v.getFieldValue())
                 .collect(Collectors.toList());
     }
+
     public Set<Integer> getSubBoard(int indexOfFirstElement) {
         String boardString = toSimpleString();
         String resultString =  Stream.of(boardString)
@@ -91,6 +92,7 @@ public class SudokuBoard implements Cloneable {
         resultSet.remove(0);
         return resultSet;
     }
+
     public Set<Integer> getSubBoardValues(int rowIndex, int colIndex) {
         if (rowIndex < 3 && colIndex < 3) {
             return getSubBoard(0);
@@ -143,14 +145,6 @@ public class SudokuBoard implements Cloneable {
         return sudokuBoardList;
     }
 
-    public void setSudokuBoardList(List<SudokuRow> sudokuBoardList) {
-        this.sudokuBoardList = sudokuBoardList;
-    }
-
-    public void newRandomBoard() {
-
-    }
-
     public void setBoardManually() {
         setAllElementsFixed();
     }
@@ -175,31 +169,44 @@ public class SudokuBoard implements Cloneable {
         return newBoard;
     }
 
-    public SudokuBoard loadBoard(File file) {
-        System.out.println(file);
-        try {
-            String textFromFile = Files.readString(file.toPath());
-            String newString = "";
-            for (char c : textFromFile.toCharArray()) {
-                if (Validator.INSTANCE.getAvailableCharacterForSudoku().contains(c)) {
-                    newString = newString + c;
-                }
+//    public SudokuBoard loadBoard(File file) throws IOException {
+//        System.out.println(file);
+//        try {
+//            String textFromFile = Files.readString(file.toPath());
+//            String newString = "";
+//            for (char c : textFromFile.toCharArray()) {
+//                if (Validator.INSTANCE.getAvailableCharacterForSudoku().contains(c)) {
+//                    newString = newString + c;
+//                }
+//            }
+//            SudokuBoard newBoard = setBoardFromString(newString);
+//            newBoard.setName(file.getName());
+//            return newBoard;
+//        } catch (IOException e) {
+//            System.out.println("Exception:" + e);
+//            return null;
+//        }
+//    }
+    public SudokuBoard loadBoard(File file) throws IOException {
+        String textFromFile = Files.readString(file.toPath());
+        String newString = "";
+        for (char c : textFromFile.toCharArray()) {
+            if (Validator.INSTANCE.getAvailableCharacterForSudoku().contains(c)) {
+                newString = newString + c;
             }
-            SudokuBoard newBoard = setBoardFromString(newString);
-            newBoard.setName(file.getName());
-            return newBoard;
-        } catch (IOException e) {
-            System.out.println("Exception:" + e);
-            return null;
         }
+        SudokuBoard newBoard = setBoardFromString(newString);
+        newBoard.setName(file.getName());
+        return newBoard;
     }
+
     public void saveBoard(File file, SudokuBoard board) throws IOException {
         byte[] bytes = board.toString().getBytes();
         Files.write(file.toPath(), bytes);
     }
+
     public SudokuBoard clearBoard() {
-        SudokuBoard board = new SudokuBoard();
-        return board;
+        return new SudokuBoard();
     }
 
     public List<SudokuElement> getUnsolvedSudokuElements() {
@@ -222,8 +229,8 @@ public class SudokuBoard implements Cloneable {
         return getSudokuBoardList().stream()
                 .flatMap(r -> r.getSudokuElementsList().stream())
                 .filter(v -> v.getFieldValue() != 0)
-                .map(f -> f.isElementValueCorrect())
-                .filter(c -> c == false)
+                .map(SudokuElement::isElementValueCorrect)
+                .filter(c -> !c)
                 .findAny().orElse(true);
     }
 

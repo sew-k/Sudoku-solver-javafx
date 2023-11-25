@@ -235,7 +235,7 @@ public class SudokuBoardTestSuite {
         Assertions.assertEquals(2, resultElement.getAvailableFieldValues().size());
     }
     @Test
-    void testSaveAndLoadBoard() {
+    void testSaveAndLoadBoard() throws IOException {
         //Given
         SudokuBoard boardToSave = new SudokuBoard();
         try {

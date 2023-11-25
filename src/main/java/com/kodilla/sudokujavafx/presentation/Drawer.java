@@ -157,11 +157,15 @@ public enum Drawer {
                 fileChooser.setInitialDirectory(new File(path));
                 File file = fileChooser.showOpenDialog(stage);
                 if (file != null) {
-                    SudokuBoard newBoard = board.loadBoard(file);
-                    GameProcessor.INSTANCE.getBackTrack().clear();
-                    GameProcessor.INSTANCE.setBoard(newBoard);
-                    GameProcessor.INSTANCE.setOriginalBoard(GameProcessor.INSTANCE.getCopyOfBoard(newBoard));
-                    drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
+                    try {
+                        SudokuBoard newBoard = board.loadBoard(file);
+                        GameProcessor.INSTANCE.getBackTrack().clear();
+                        GameProcessor.INSTANCE.setBoard(newBoard);
+                        GameProcessor.INSTANCE.setOriginalBoard(GameProcessor.INSTANCE.getCopyOfBoard(newBoard));
+                        drawMainWindow(stage, GameProcessor.INSTANCE.getBoard());
+                    } catch (IOException e) {
+                        System.out.println("Exception while loading board: " + e); //TODO - better exception handling
+                    }
                 }
             }
         });
@@ -178,7 +182,7 @@ public enum Drawer {
                     try {
                         board.saveBoard(file, GameProcessor.INSTANCE.getBoard());
                     } catch (IOException e) {
-                        System.out.println("Exception while saving board: " + e);
+                        System.out.println("Exception while saving board: " + e);   //TODO - better exception handling
                     }
                 }
             }
