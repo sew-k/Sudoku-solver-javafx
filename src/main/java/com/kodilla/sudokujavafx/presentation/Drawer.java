@@ -9,12 +9,9 @@ import com.kodilla.sudokujavafx.logic.Validator;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -25,13 +22,14 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.List;
 
 public enum Drawer {
     INSTANCE;
+
     private Drawer() {
 
     }
+
     public Pane drawBoardInPane(Stage stage, SudokuBoard board) {
         GridPane gridPane = new GridPane();
         for (int r = 0; r < board.getSudokuBoardList().size(); r++) {
@@ -44,23 +42,14 @@ public enum Drawer {
     }
 
     public TextField drawField(Stage stage, SudokuElement sudokuElement) {
-        String fieldValue = Integer.toString(sudokuElement.getFieldValue());
-        if (fieldValue.equals("0")) fieldValue = "";
-        TextField field = new TextField(fieldValue);
-        field.setMinSize(50,50);
-        field.setMaxSize(50,50);
-        field.setAlignment(Pos.CENTER);
+        TextField field = setupSudokuElementTextField(sudokuElement);
+        field = addFieldValueProcessor(stage, sudokuElement, field);
+        field.setFocusTraversable(false);
+        return field;
+    }
 
-        if (sudokuElement.isFixed()) {
-            field.setStyle("-fx-text-fill: BLACK; -fx-border-color: gray; -fx-font-size: 18; -fx-font-weight: bold");
-            field.setEditable(false);
-        } else if (!sudokuElement.isFixed() && sudokuElement.isElementValueCorrect()) {
-            field.setStyle("-fx-text-fill: BLUE; -fx-border-color: gray; -fx-font-size: 18");
-            field.setEditable(true);
-        } else if (!sudokuElement.isFixed() && !sudokuElement.isElementValueCorrect()) {
-            field.setStyle("-fx-text-fill: RED; -fx-border-color: gray; -fx-font-size: 18");
-            field.setEditable(true);
-        }
+    //TODO - better rebuild this method needed
+    private TextField addFieldValueProcessor(Stage stage, SudokuElement sudokuElement, TextField field) {
         field.textProperty().addListener(((observable, oldValue, newValue) -> {
             try {
                 if ((Validator.INSTANCE.checkFieldTextToInt(newValue)) && !newValue.equals("0")) {
@@ -75,9 +64,7 @@ public enum Drawer {
                     } else if (GameProcessor.getDifficulty().equals(GameDifficulty.MEDIUM)) {
                         field.setStyle("-fx-text-fill: grey; -fx-border-color: gray; -fx-font-size: 18");
                     }
-
                     SudokuBoard copyBoardToBackTrack;
-
                     copyBoardToBackTrack = GameProcessor.INSTANCE.getCopyOfBoard(GameProcessor.INSTANCE.getBoard());
                     sudokuElement.setFieldValue(Integer.parseInt(newValue));
 
@@ -101,7 +88,30 @@ public enum Drawer {
             }
         }
         ));
-        field.setFocusTraversable(false);
+        return field;
+    }
+
+    private String getFieldValueFromSudokuElement(SudokuElement sudokuElement) {
+        String fieldValue = Integer.toString(sudokuElement.getFieldValue());
+        if (fieldValue.equals("0")) fieldValue = "";
+        return fieldValue;
+    }
+
+    private TextField setupSudokuElementTextField(SudokuElement sudokuElement) {
+        TextField field = new TextField(getFieldValueFromSudokuElement(sudokuElement));
+        field.setMinSize(50,50);
+        field.setMaxSize(50,50);
+        field.setAlignment(Pos.CENTER);
+        if (sudokuElement.isFixed()) {
+            field.setStyle(ViewConfig.FIXED_SUDOKU_ELEMENT);
+            field.setEditable(false);
+        } else if (!sudokuElement.isFixed() && sudokuElement.isElementValueCorrect()) {
+            field.setStyle(ViewConfig.NOT_FIXED_CORRECT_SUDOKU_ELEMENT);
+            field.setEditable(true);
+        } else if (!sudokuElement.isFixed() && !sudokuElement.isElementValueCorrect()) {
+            field.setStyle(ViewConfig.NOT_FIXED_INCORRECT_SUDOKU_ELEMENT);
+            field.setEditable(true);
+        }
         return field;
     }
 
@@ -123,7 +133,6 @@ public enum Drawer {
              }
         });
         game.getItems().addAll(newGame, loadGame, saveGame, exitGame);
-
         Menu boardMenu = new Menu("Board");
         MenuItem newRandomBoard = new MenuItem("New random board");
         newRandomBoard.setDisable(true);
