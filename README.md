@@ -32,6 +32,16 @@ The next step is to implement clean code best practices and a few Creational Des
 
 ### How to use
 
+## Features to be implemented
 
+- `menu -> Game -> New game` - Starting new game with a blank Sudoku oard
+- `menu -> Game -> Load game` - Loading a previously saved game
+- `menu -> Game -> Save game` - Saving the game - Sudoku Board with fixed elements and those filled by Player
+- `menu -> Board -> New random board` - Generating a random board drawn by the CPU
+- `menu -> Settings -> Difficulty settings -> medium` - Sudoku elements filled by the Player are all gray 
+(not marked as valid or invalid)
+- `menu -> Settings -> Difficulty settings` -> hard - Passage of time resulting in the disappearance of last filled values
+- `menu -> Settings -> Board settings` - To consider if it is even necessary
+- Improving view layer visuals and UX
 
 ## Troubleshooting
