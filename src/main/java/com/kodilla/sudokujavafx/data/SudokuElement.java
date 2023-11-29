@@ -1,6 +1,7 @@
 package com.kodilla.sudokujavafx.data;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -17,22 +18,16 @@ public class SudokuElement {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
-        SudokuElement that = (SudokuElement) o;
-
-        if (fieldValue != that.fieldValue) return false;
-        if (rowIndex != that.rowIndex) return false;
-        if (colIndex != that.colIndex) return false;
-        return fixed == that.fixed;
+        SudokuElement element = (SudokuElement) o;
+        return fieldValue == element.fieldValue
+                && rowIndex == element.rowIndex
+                && colIndex == element.colIndex
+                && fixed == element.fixed;
     }
 
     @Override
     public int hashCode() {
-        int result = fieldValue;
-        result = 31 * result + rowIndex;
-        result = 31 * result + colIndex;
-        result = 31 * result + (fixed ? 1 : 0);
-        return result;
+        return Objects.hash(fieldValue, rowIndex, colIndex, fixed);
     }
 
     public boolean isFixed() {
@@ -53,6 +48,7 @@ public class SudokuElement {
         this.rowIndex = rowIndex;
         this.colIndex = colIndex;
     }
+
     public SudokuElement(int fieldValue, final int rowIndex, final int colIndex, Set<Integer> availableFieldValues, boolean fixed) {
         this.fieldValue = fieldValue;
         this.rowIndex = rowIndex;
@@ -85,9 +81,9 @@ public class SudokuElement {
     public void setAvailableFieldValues(Set<Integer> availableFieldValues) {
         this.availableFieldValues = availableFieldValues;
     }
+
     public void calculateAvailableFieldValues(SudokuBoard board) {
         Set<Integer> resultValues = new HashSet<>(Set.of(0,1,2,3,4,5,6,7,8,9));
-
         Set<Integer> actualRowSet = board.getRowValues(getRowIndex()).stream().collect(Collectors.toSet());
         resultValues.removeAll(actualRowSet);
         Set<Integer> actualColSet = board.getColValues(getColIndex()).stream().collect(Collectors.toSet());
@@ -95,9 +91,9 @@ public class SudokuElement {
         Set<Integer> actualSubBoardSet = board.getSubBoardValues(getRowIndex(), getColIndex());
         resultValues.removeAll(actualSubBoardSet);
         resultValues.removeAll(getFalseFieldValues());
-
         setAvailableFieldValues(resultValues);
     }
+
     public Set getAvailableFieldValues(SudokuBoard board) {
         calculateAvailableFieldValues(board);
         return this.availableFieldValues;
@@ -125,6 +121,6 @@ public class SudokuElement {
 
     public int getFirstElementSolution() {
         return getAvailableFieldValues().stream()
-                .findFirst().orElse(null);
+                .findFirst().orElse(0);
     }
 }
