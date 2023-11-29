@@ -169,24 +169,6 @@ public class SudokuBoard implements Cloneable {
         return newBoard;
     }
 
-//    public SudokuBoard loadBoard(File file) throws IOException {
-//        System.out.println(file);
-//        try {
-//            String textFromFile = Files.readString(file.toPath());
-//            String newString = "";
-//            for (char c : textFromFile.toCharArray()) {
-//                if (Validator.INSTANCE.getAvailableCharacterForSudoku().contains(c)) {
-//                    newString = newString + c;
-//                }
-//            }
-//            SudokuBoard newBoard = setBoardFromString(newString);
-//            newBoard.setName(file.getName());
-//            return newBoard;
-//        } catch (IOException e) {
-//            System.out.println("Exception:" + e);
-//            return null;
-//        }
-//    }
     public SudokuBoard loadBoard(File file) throws IOException {
         String textFromFile = Files.readString(file.toPath());
         String newString = "";
