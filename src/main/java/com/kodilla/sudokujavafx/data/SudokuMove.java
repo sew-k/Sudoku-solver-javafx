@@ -36,7 +36,10 @@ public class SudokuMove {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SudokuMove move = (SudokuMove) o;
-        return rowIndex == move.rowIndex && colIndex == move.colIndex && newValue == move.newValue && Objects.equals(board, move.board);
+        return rowIndex == move.rowIndex
+                && colIndex == move.colIndex
+                && newValue == move.newValue
+                && Objects.equals(board, move.board);
     }
 
     @Override
