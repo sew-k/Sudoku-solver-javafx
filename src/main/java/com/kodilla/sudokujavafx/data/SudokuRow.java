@@ -2,7 +2,7 @@ package com.kodilla.sudokujavafx.data;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.Objects;
 
 public class SudokuRow {
     private List<SudokuElement> sudokuElementsList;
@@ -12,18 +12,14 @@ public class SudokuRow {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         SudokuRow sudokuRow = (SudokuRow) o;
-
-        if (rowNumber != sudokuRow.rowNumber) return false;
-        return sudokuElementsList.equals(sudokuRow.sudokuElementsList);
+        return rowNumber == sudokuRow.rowNumber
+                && Objects.equals(sudokuElementsList, sudokuRow.sudokuElementsList);
     }
 
     @Override
     public int hashCode() {
-        int result = sudokuElementsList.hashCode();
-        result = 31 * result + rowNumber;
-        return result;
+        return Objects.hash(sudokuElementsList, rowNumber);
     }
 
     public SudokuRow(final int rowNumber) {
@@ -50,5 +46,4 @@ public class SudokuRow {
     public int getRowNumber() {
         return rowNumber;
     }
-
 }
